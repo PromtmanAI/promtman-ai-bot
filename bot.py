@@ -15,6 +15,7 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+used_users = set()
 
 
 @dp.message(CommandStart())
@@ -30,6 +31,13 @@ async def start(message: Message):
 @dp.message()
 async def generate(message: Message):
     if not message.text:
+        return
+    user_id = message.from_user.id
+
+    if user_id in used_users:
+        await message.answer(
+            "🔒 Бесплатная генерация уже использована."
+        )
         return
 
     status = await message.answer("⏳ Создаю изображение...")
@@ -53,6 +61,7 @@ async def generate(message: Message):
             image,
             caption="✨ Готово!"
         )
+        used_users.add(user_id)
 
         await status.delete()
 
