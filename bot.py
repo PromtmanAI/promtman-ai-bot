@@ -6,17 +6,23 @@ from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message, BufferedInputFile
 from openai import OpenAI
-
+import psycopg
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
-used_users = set()
-
+with psycopg.connect(DATABASE_URL) as conn:
+    with conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id BIGINT PRIMARY KEY
+            )
+        """)
 
 @dp.message(CommandStart())
 async def start(message: Message):
@@ -33,22 +39,25 @@ async def generate(message: Message):
     if not message.text:
         return
     user_id = message.from_user.id
+        with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT user_id FROM users WHERE user_id = %s",
+                (user_id,)
+            )
+            if cur.fetchone():
+                await message.answer(
+                    "🔒 Бесплатная генерация уже использована."
+                )
+                return
 
-    if user_id in used_users:
-        await message.answer(
-            "🔒 Бесплатная генерация уже использована."
-        )
-        return
+    
 
     status = await message.answer("⏳ Создаю изображение...")
 
     try:
         result = await asyncio.to_thread(
-            client.images.generate,
-            model="gpt-image-1",
-            prompt=message.text,
-            size="1024x1024",
-        )
+            
 
         image_bytes = base64.b64decode(result.data[0].b64_json)
 
@@ -61,7 +70,12 @@ async def generate(message: Message):
             image,
             caption="✨ Готово!"
         )
-        used_users.add(user_id)
+                with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO users (user_id) VALUES (%s) ON CONFLICT DO NOTHING",
+                    (user_id,)
+                )
 
         await status.delete()
 
