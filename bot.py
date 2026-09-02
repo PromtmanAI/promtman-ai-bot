@@ -207,14 +207,27 @@ async def receive_reference(message: Message):
     file = await bot.get_file(photo.file_id)
     photo_bytes = await bot.download_file(file.file_path)
 
-    if user_id not in user_references:
-        user_references[user_id] = {"model": "gpt", "image": None}
+        if user_id not in user_references:
+        user_references[user_id] = {"model": "gpt", "images": []}
 
-    user_references[user_id]["image"] = photo_bytes.read()
+    if "images" not in user_references[user_id]:
+        user_references[user_id]["images"] = []
+
+    if len(user_references[user_id]["images"]) >= 5:
+        await message.answer("⚠️ Можно добавить максимум 5 фото.")
+        return
+
+    user_references[user_id]["images"].append(photo_bytes.read())
 
     prompt_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
+            [
+    InlineKeyboardButton(
+        text="✅ Готово, перейти к промту",
+        callback_data="references_done"
+    )
+],
             InlineKeyboardButton(
                 text="✍️ Написать свой промт",
                 callback_data="prompt_myself"
@@ -234,6 +247,21 @@ async def receive_reference(message: Message):
     "Что делаем дальше?",
     reply_markup=prompt_menu
 )
+    @dp.callback_query(lambda c: c.data == "references_done")
+async def references_done(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+    reference_data = user_references.get(user_id)
+
+    if not reference_data or not reference_data.get("images"):
+        await callback.message.answer("❌ Сначала отправь хотя бы одно фото.")
+        return
+
+    await callback.message.answer(
+        f"✅ Добавлено фото: {len(reference_data['images'])}\n\n"
+        "Теперь напиши, что хочешь создать."
+    )
 @dp.callback_query(lambda c: c.data == "prompt_myself")
 async def prompt_myself(callback: CallbackQuery):
     await callback.answer()
@@ -434,12 +462,12 @@ async def generate(message: Message):
 
     try:
         reference_data = user_references.get(user_id)
-        reference_bytes = reference_data.get("image") if reference_data else None
+        reference_images = reference_data.get("images", []) if reference_data else []
         selected_model = reference_data.get("model") if reference_data else None
         if reference_data:
             reference_data["last_prompt"] = prompt_text
 
-        if not reference_bytes:
+        if not reference_images:
             await status.edit_text(
                 "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
             )
@@ -464,13 +492,16 @@ async def generate(message: Message):
                                 if reference_data.get("quality") == "4K" else ""
                             )
                         )
-                    },
-                    {
-                        "type": "image",
-                        "data": base64.b64encode(reference_bytes).decode("utf-8"),
-                        "mime_type": "image/jpeg"
-                    }
-                ],
+                                },
+            *[
+                {
+                    "type": "image",
+                    "data": base64.b64encode(img).decode("utf-8"),
+                    "mime_type": "image/jpeg"
+                }
+                for img in reference_images
+            ]
+        ],
                 response_format={
                     "type": "image",
                     "image_size": reference_data.get("quality", "1K"),
@@ -481,10 +512,11 @@ async def generate(message: Message):
             image_bytes = base64.b64decode(interaction.output_image.data)
 
         elif selected_model == "seedream":
-            reference_data_uri = (
-                "data:image/jpeg;base64,"
-                + base64.b64encode(reference_bytes).decode("utf-8")
-            )
+            reference_data_uris = [
+    "data:image/jpeg;base64,"
+    + base64.b64encode(img).decode("utf-8")
+    for img in reference_images
+            ]
 
             result = await asyncio.to_thread(
                 fal_client.subscribe,
@@ -498,7 +530,7 @@ async def generate(message: Message):
     "Изменяй только то, что пользователь явно попросил изменить. "
     "Запрос пользователя: " + prompt_text
 ),
-                    "image_urls": [reference_data_uri],
+                    "image_urls": reference_data_uris,
                     "num_images": 1,
                     "output_format": "jpeg"
                 }
@@ -517,7 +549,10 @@ async def generate(message: Message):
             result = await asyncio.to_thread(
                 client.images.edit,
                 model="gpt-image-1",
-                image=("reference.png", reference_bytes, "image/png"),
+                image=[
+    (f"reference_{i}.jpg", img, "image/jpeg")
+    for i, img in enumerate(reference_images)
+],
                 prompt=(
                     "Используй человека с референсного фото как основу. "
                     "Сохраняй его узнаваемость и основные черты внешности, "
