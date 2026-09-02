@@ -70,7 +70,7 @@ async def buy_button(callback: CallbackQuery):
     )
     @dp.callback_query(lambda c: c.data == "buy_5")
     async def buy_5(callback: CallbackQuery):
-    await callback.answer()
+        await callback.answer()
 
     await callback.message.answer_invoice(
         title="5 генераций",
