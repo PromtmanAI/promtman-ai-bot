@@ -163,7 +163,7 @@ with psycopg.connect(DATABASE_URL) as conn:
             image,
             caption="✨ Готово!"
         )
-                with psycopg.connect(DATABASE_URL) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
                     cur.execute(
