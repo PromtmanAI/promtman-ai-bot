@@ -93,6 +93,24 @@ async def receive_reference(message: Message):
         "✅ Фото получено!\n\n"
         "✍️ Теперь напиши промт — что нужно создать или изменить."
     )
+@dp.message(lambda message: message.text == "👤 Профиль")
+async def profile_text(message: Message):
+    user_id = message.from_user.id
+
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT balance FROM users WHERE user_id = %s",
+                (user_id,)
+            )
+            row = cur.fetchone()
+
+    balance = row[0] if row else 0
+
+    await message.answer(
+        f"👤 Профиль\n\n"
+        f"💎 Генераций на балансе: {balance}"
+    )
 @dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
     await callback.answer()
