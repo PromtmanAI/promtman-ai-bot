@@ -196,9 +196,46 @@ async def receive_reference(message: Message):
 
     user_references[user_id]["image"] = photo_bytes.read()
 
-    await message.answer(
-        "✅ Фото получено!\n\n"
-        "✍️ Теперь напиши промт — что нужно создать или изменить."
+    prompt_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="✍️ Написать свой промт",
+                callback_data="prompt_myself"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="🔥 Помоги составить промт",
+                callback_data="prompt_help"
+            )
+        ]
+    ]
+)
+
+await message.answer(
+    "✅ Фото получено!\n\n"
+    "Что делаем дальше?",
+    reply_markup=prompt_menu
+)
+@dp.callback_query(lambda c: c.data == "prompt_myself")
+async def prompt_myself(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer(
+        "✍️ Напиши, что хочешь создать или изменить."
+    )
+
+
+@dp.callback_query(lambda c: c.data == "prompt_help")
+async def prompt_help(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer(
+        "🔥 Опиши простыми словами, что хочешь получить.\n\n"
+        "Например:\n"
+        "«Хочу фото возле Lamborghini ночью в Дубае»\n\n"
+        "Я помогу превратить это в хороший промт."
     )
 @dp.message(lambda message: message.text == "👤 Профиль")
 async def profile_text(message: Message):
