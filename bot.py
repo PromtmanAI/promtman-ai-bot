@@ -1,6 +1,7 @@
 import os
 import asyncio
 import base64
+import urllib.request
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
@@ -9,11 +10,13 @@ from openai import OpenAI
 from google import genai
 from google.genai import types
 import psycopg
+import fal_client
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
+FAL_KEY = os.getenv("FAL_KEY")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -83,7 +86,8 @@ async def generate_reference_start(message: Message):
     model_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
-            [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")]
+            [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
+            [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")]
         ]
     )
 
@@ -99,7 +103,19 @@ async def select_gpt(callback: CallbackQuery):
     await callback.message.answer(
         "🖼 Отправь фото-референс для GPT Image."
     )
+@dp.callback_query(lambda c: c.data == "model_seedream")
+async def select_seedream(callback: CallbackQuery):
+    await callback.answer()
 
+    user_references[callback.from_user.id] = {
+        "model": "seedream",
+        "image": None
+    }
+
+    await callback.message.answer(
+        "💥 Выбран Seedream 5.0 Pro.\n\n"
+        "🖼 Отправь фото-референс."
+    )
 
 @dp.callback_query(lambda c: c.data == "model_nano_pro")
 async def select_nano_pro(callback: CallbackQuery):
@@ -459,8 +475,30 @@ async def generate(message: Message):
             )
 
             image_bytes = base64.b64decode(interaction.output_image.data)
+            
+elif selected_model == "seedream":
+    reference_data_uri = (
+        "data:image/jpeg;base64,"
+        + base64.b64encode(reference_bytes).decode("utf-8")
+    )
 
-        else:
+    result = await asyncio.to_thread(
+        fal_client.subscribe,
+        "bytedance/seedream/v5/pro/edit",
+        arguments={
+            "prompt": prompt_text,
+            "image_urls": [reference_data_uri],
+            "num_images": 1,
+            "output_format": "jpeg"
+        }
+    )
+
+    image_url = result["images"][0]["url"]
+    image_bytes = await asyncio.to_thread(
+    lambda: urllib.request.urlopen(image_url, timeout=60).read()
+)
+
+else:
             result = await asyncio.to_thread(
                 client.images.edit,
                 model="gpt-image-1",
