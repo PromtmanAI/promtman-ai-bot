@@ -4,7 +4,7 @@ import base64
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, BufferedInputFile
+from aiogram.types import Message, BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from openai import OpenAI
 import psycopg
 
@@ -16,6 +16,17 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🎨 Создать изображение", callback_data="generate"),
+            InlineKeyboardButton(text="💎 Купить генерации", callback_data="buy"),
+        ],
+        [
+            InlineKeyboardButton(text="👤 Профиль", callback_data="profile"),
+        ]
+    ]
+)
 with psycopg.connect(DATABASE_URL) as conn:
     with conn.cursor() as cur:
         cur.execute("""
@@ -30,8 +41,9 @@ async def start(message: Message):
         "👋 Привет! Я Promtman AI.\n\n"
         "🎨 Напиши, какую картинку хочешь создать.\n\n"
         "Например:\n"
-        "Белый Mercedes ночью в Дубае, cinematic photo"
-    )
+        "Белый Mercedes ночью в Дубае, cinematic photo", 
+    reply_markup=menu
+     )
 
 
 @dp.message()
