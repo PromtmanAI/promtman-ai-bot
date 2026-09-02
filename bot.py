@@ -52,6 +52,22 @@ async def generate_button(callback: CallbackQuery):
     await callback.message.answer(
         "🎨 Напиши промт — опиши, какую картинку хочешь создать."
     ) 
+@dp.callback_query(lambda c: c.data == "buy")
+async def buy_button(callback: CallbackQuery):
+    await callback.answer()
+
+    buy_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="5 генераций — 50 ⭐", callback_data="buy_5")],
+            [InlineKeyboardButton(text="10 генераций — 90 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="25 генераций — 200 ⭐", callback_data="buy_25")]
+        ]
+    )
+
+    await callback.message.answer(
+        "💎 Выбери пакет генераций:",
+        reply_markup=buy_menu
+    )
 @dp.message()
 async def generate(message: Message):
     if not message.text:
