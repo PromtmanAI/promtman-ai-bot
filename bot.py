@@ -408,7 +408,7 @@ async def generate(message: Message):
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
         if reference_data:
-    reference_data["last_prompt"] = prompt_text
+        reference_data["last_prompt"] = prompt_text
     use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
