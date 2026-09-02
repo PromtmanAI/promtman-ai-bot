@@ -323,10 +323,14 @@ async def generate(message: Message):
         )
 
         await message.answer_photo(
-            image,
-            caption="✨ Готово!"
-        )
+    BufferedInputFile(image_bytes, filename="promtman_preview.png"),
+    caption="✨ Готово!"
+)
 
+        await message.answer_document(
+    BufferedInputFile(image_bytes, filename="promtman_2K.png"),
+    caption="📁 Оригинал в полном качестве"
+)
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
