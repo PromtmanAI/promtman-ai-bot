@@ -14,6 +14,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
+user_references = {}
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 menu = InlineKeyboardMarkup(
@@ -77,6 +78,20 @@ async def generate_button(callback: CallbackQuery):
 async def generate_reference_start(message: Message):
     await message.answer(
         "🖼 Отправь фото, которое хочешь использовать как референс."
+    )
+@dp.message(lambda message: message.photo is not None)
+async def receive_reference(message: Message):
+    user_id = message.from_user.id
+
+    photo = message.photo[-1]
+    file = await bot.get_file(photo.file_id)
+    photo_bytes = await bot.download_file(file.file_path)
+
+    user_references[user_id] = photo_bytes.read()
+
+    await message.answer(
+        "✅ Фото получено!\n\n"
+        "✍️ Теперь напиши промт — что нужно создать или изменить."
     )
 @dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
