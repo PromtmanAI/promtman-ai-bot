@@ -39,7 +39,7 @@ async def generate(message: Message):
     if not message.text:
         return
     user_id = message.from_user.id
-        with psycopg.connect(DATABASE_URL) as conn:
+    with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT user_id FROM users WHERE user_id = %s",
@@ -70,8 +70,8 @@ async def generate(message: Message):
             image,
             caption="✨ Готово!"
         )
-                with psycopg.connect(DATABASE_URL) as conn:
-            with conn.cursor() as cur:
+            with psycopg.connect(DATABASE_URL) as conn:
+                with conn.cursor() as cur:
                 cur.execute(
                     "INSERT INTO users (user_id) VALUES (%s) ON CONFLICT DO NOTHING",
                     (user_id,)
