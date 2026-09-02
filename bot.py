@@ -213,7 +213,7 @@ async def receive_reference(message: Message):
     ]
 )
 
-await message.answer(
+    await message.answer(
     "✅ Фото получено!\n\n"
     "Что делаем дальше?",
     reply_markup=prompt_menu
@@ -358,7 +358,7 @@ async def test_credits(message: Message):
                 """,
                 (user_id,)
             )
-        await message.answer("🧪 Добавлено 10 тестовых генераций.")
+    await message.answer("🧪 Добавлено 10 тестовых генераций.")
 @dp.message()
 async def generate(message: Message):
     if not message.text:
