@@ -58,7 +58,7 @@ async def generate_button(callback: CallbackQuery):
     await callback.message.answer(
         "🎨 Напиши промт — опиши, какую картинку хочешь создать."
     ) 
-    @dp.callback_query(lambda c: c.data == "profile")
+@dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
     await callback.answer()
 
