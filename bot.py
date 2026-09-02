@@ -89,7 +89,7 @@ async def generate(message: Message):
         )
         with psycopg.connect(DATABASE_URL) as conn:
                 with conn.cursor() as cur:
-                cur.execute(
+                    cur.execute(
                     "INSERT INTO users (user_id) VALUES (%s) ON CONFLICT DO NOTHING",
                     (user_id,)
                 )
