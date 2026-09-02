@@ -262,62 +262,61 @@ async def generate(message: Message):
 
     status = await message.answer("⏳ Создаю изображение...")
 
-    try:
+        try:
         reference_data = user_references.get(user_id)
-reference_bytes = reference_data.get("image") if reference_data else None
-selected_model = reference_data.get("model") if reference_data else None
+        reference_bytes = reference_data.get("image") if reference_data else None
+        selected_model = reference_data.get("model") if reference_data else None
 
         if not reference_bytes:
             await status.edit_text(
-        "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
-    )
+                "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
+            )
             return
 
         if selected_model == "nano_pro":
-    interaction = await asyncio.to_thread(
-        gemini_client.interactions.create,
-        model="gemini-3-pro-image",
-        input=[
-            {
-                "type": "text",
-                "text": (
+            interaction = await asyncio.to_thread(
+                gemini_client.interactions.create,
+                model="gemini-3-pro-image",
+                input=[
+                    {
+                        "type": "text",
+                        "text": (
+                            "Используй человека с референсного фото как основу. "
+                            "Сохраняй его узнаваемость и основные черты внешности, "
+                            "но выполняй изменения, которые пользователь явно попросил. "
+                            "Запрос пользователя: " + message.text
+                        )
+                    },
+                    {
+                        "type": "image",
+                        "data": base64.b64encode(reference_bytes).decode("utf-8"),
+                        "mime_type": "image/jpeg"
+                    }
+                ],
+                response_format={
+                    "type": "image",
+                    "image_size": "1K"
+                }
+            )
+
+            image_bytes = base64.b64decode(interaction.output_image.data)
+
+        else:
+            result = await asyncio.to_thread(
+                client.images.edit,
+                model="gpt-image-1",
+                image=("reference.png", reference_bytes, "image/png"),
+                prompt=(
                     "Используй человека с референсного фото как основу. "
                     "Сохраняй его узнаваемость и основные черты внешности, "
-                    "но выполняй изменения, которые пользователь явно попросил. "
+                    "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
+                    "Не изменяй другие черты без необходимости. "
                     "Запрос пользователя: " + message.text
-                )
-            },
-            {
-                "type": "image",
-                "data": base64.b64encode(reference_bytes).decode("utf-8"),
-                "mime_type": "image/jpeg"
-            }
-        ],
-        response_format={
-            "type": "image",
-            "image_size": "1K"
-        }
-    )
+                ),
+                size="1024x1024",
+            )
 
-    image_bytes = base64.b64decode(interaction.output_image.data)
-
-else:
-    result = await asyncio.to_thread(
-        client.images.edit,
-        model="gpt-image-1",
-        image=("reference.png", reference_bytes, "image/png"),
-        prompt=(
-            "Используй человека с референсного фото как основу. "
-            "Сохраняй его узнаваемость и основные черты внешности, "
-            "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
-            "Не изменяй другие черты без необходимости. "
-            "Запрос пользователя: " + message.text
-        ),
-        size="1024x1024",
-    )
-
-    image_bytes = base64.b64decode(result.data[0].b64_json)
-
+            image_bytes = base64.b64decode(result.data[0].b64_json)
         image = BufferedInputFile(
             image_bytes,
             filename="promtman.png"
