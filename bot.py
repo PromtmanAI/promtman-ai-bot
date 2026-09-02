@@ -453,12 +453,12 @@ async def generate(message: Message):
                             "Сохраняй его узнаваемость и основные черты внешности, "
                             "но выполняй изменения, которые пользователь явно попросил. "
                             "Запрос пользователя: " + prompt_text +
-(
-    " Максимальное качество: ультравысокая детализация, фотореализм, "
-    "естественная текстура кожи, точные мелкие детали, реалистичное освещение, "
-    "чёткий фокус, минимум артефактов, профессиональное качество фотографии."
-    if reference_data.get("quality") == "4K" else ""
-)
+                            (
+                                " Максимальное качество: ультравысокая детализация, фотореализм, "
+                                "естественная текстура кожи, точные мелкие детали, реалистичное освещение, "
+                                "чёткий фокус, минимум артефактов, профессиональное качество фотографии."
+                                if reference_data.get("quality") == "4K" else ""
+                            )
                         )
                     },
                     {
@@ -469,36 +469,40 @@ async def generate(message: Message):
                 ],
                 response_format={
                     "type": "image",
-                    "image_size": reference_data.get("quality", "1K"), 
+                    "image_size": reference_data.get("quality", "1K"),
                     "aspect_ratio": reference_data.get("ratio", "1:1")
                 }
             )
 
             image_bytes = base64.b64decode(interaction.output_image.data)
-            
-elif selected_model == "seedream":
-    reference_data_uri = (
-        "data:image/jpeg;base64,"
-        + base64.b64encode(reference_bytes).decode("utf-8")
-    )
 
-    result = await asyncio.to_thread(
-        fal_client.subscribe,
-        "bytedance/seedream/v5/pro/edit",
-        arguments={
-            "prompt": prompt_text,
-            "image_urls": [reference_data_uri],
-            "num_images": 1,
-            "output_format": "jpeg"
-        }
-    )
+        elif selected_model == "seedream":
+            reference_data_uri = (
+                "data:image/jpeg;base64,"
+                + base64.b64encode(reference_bytes).decode("utf-8")
+            )
 
-    image_url = result["images"][0]["url"]
-    image_bytes = await asyncio.to_thread(
-    lambda: urllib.request.urlopen(image_url, timeout=60).read()
-)
+            result = await asyncio.to_thread(
+                fal_client.subscribe,
+                "bytedance/seedream/v5/pro/edit",
+                arguments={
+                    "prompt": prompt_text,
+                    "image_urls": [reference_data_uri],
+                    "num_images": 1,
+                    "output_format": "jpeg"
+                }
+            )
 
-else:
+            image_url = result["images"][0]["url"]
+
+            image_bytes = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(
+                    image_url,
+                    timeout=60
+                ).read()
+            )
+
+        else:
             result = await asyncio.to_thread(
                 client.images.edit,
                 model="gpt-image-1",
