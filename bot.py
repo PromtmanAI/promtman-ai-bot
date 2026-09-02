@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,ReplyKeyboardMarkup, KeyboardButton 
 from openai import OpenAI
+from google import genai
 import psycopg
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
