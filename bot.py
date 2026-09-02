@@ -17,7 +17,18 @@ dp = Dispatcher()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 menu = InlineKeyboardMarkup(
-    reply_menu = ReplyKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🎨 Создать изображение", callback_data="generate"),
+            InlineKeyboardButton(text="💎 Купить генерации", callback_data="buy"),
+        ],
+        [
+            InlineKeyboardButton(text="👤 Профиль", callback_data="profile"),
+        ]
+    ]
+)
+
+reply_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="🎨 Создать изображение"),
@@ -29,16 +40,8 @@ menu = InlineKeyboardMarkup(
     ],
     resize_keyboard=True
 )
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🎨 Создать изображение", callback_data="generate"),
-            InlineKeyboardButton(text="💎 Купить генерации", callback_data="buy"),
-        ],
-        [
-            InlineKeyboardButton(text="👤 Профиль", callback_data="profile"),
-        ]
-    ]
-)
+    
+    
 with psycopg.connect(DATABASE_URL) as conn:
     with conn.cursor() as cur:
         cur.execute("""
