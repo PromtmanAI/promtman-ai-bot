@@ -365,7 +365,7 @@ async def generate(message: Message):
         return
 
     user_id = message.from_user.id
-        prompt_text = message.text
+    prompt_text = message.text
     reference_data = user_references.get(user_id)
 
     if reference_data and reference_data.get("prompt_help"):
