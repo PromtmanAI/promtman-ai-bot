@@ -203,16 +203,15 @@ async def generate(message: Message):
             await status.edit_text(
         "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
     )
-    return
+                return
 
-result = await asyncio.to_thread(
-    client.images.edit,
-    model="gpt-image-1",
-    image=("reference.png", reference_bytes, "image/png"),
-    prompt=message.text,
-    size="1024x1024",
-)
-     
+        result = await asyncio.to_thread(
+            client.images.edit,
+            model="gpt-image-1",
+            image=("reference.png", reference_bytes, "image/png"),
+            prompt=message.text,
+            size="1024x1024",
+        )
 
         image_bytes = base64.b64decode(result.data[0].b64_json)
 
