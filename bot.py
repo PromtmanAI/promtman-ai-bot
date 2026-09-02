@@ -115,42 +115,39 @@ async def successful_payment(message: Message):
 async def generate(message: Message):
     if not message.text:
         return
+
     user_id = message.from_user.id
     use_paid = False
 
-with psycopg.connect(DATABASE_URL) as conn:
-    with conn.cursor() as cur:
-        cur.execute(
-            "SELECT balance FROM users WHERE user_id = %s",
-            (user_id,)
-        )
-        row = cur.fetchone()
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT balance FROM users WHERE user_id = %s",
+                (user_id,)
+            )
+            row = cur.fetchone()
 
-        if row:
-            balance = row[0]
+            if row:
+                balance = row[0]
 
-            if balance <= 0:
-                await message.answer(
-                    "🔒 Бесплатная генерация уже использована.\n"
-                    "💎 Купи генерации, чтобы продолжить."
-                )
-                return
+                if balance <= 0:
+                    await message.answer(
+                        "🔒 Бесплатная генерация уже использована.\n"
+                        "💎 Купи генерации, чтобы продолжить."
+                    )
+                    return
 
-            use_paid = True
-           
-
-    
+                use_paid = True
 
     status = await message.answer("⏳ Создаю изображение...")
 
     try:
         result = await asyncio.to_thread(
-                        client.images.generate,
+            client.images.generate,
             model="gpt-image-1",
             prompt=message.text,
             size="1024x1024",
         )
-            
 
         image_bytes = base64.b64decode(result.data[0].b64_json)
 
@@ -163,6 +160,7 @@ with psycopg.connect(DATABASE_URL) as conn:
             image,
             caption="✨ Готово!"
         )
+
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
@@ -179,6 +177,7 @@ with psycopg.connect(DATABASE_URL) as conn:
                         """,
                         (user_id,)
                     )
+
         await status.delete()
 
     except Exception as e:
@@ -186,8 +185,6 @@ with psycopg.connect(DATABASE_URL) as conn:
         await status.edit_text(
             "❌ Не удалось создать изображение. Попробуй ещё раз."
         )
-
-
 async def main():
     await dp.start_polling(bot)
 
