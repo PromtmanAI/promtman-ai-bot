@@ -540,16 +540,7 @@ async def generate(message: Message):
         await message.answer_document(
     BufferedInputFile(image_bytes, filename=f"promtman_{reference_data.get('quality', '1K')}.png"),
 )
-        repeat_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text="🔄 Повторить", callback_data="repeat_generation")]
-    ]
-)
 
-       await message.answer(
-    "Хочешь создать ещё раз с тем же фото и промтом?",
-    reply_markup=repeat_menu
-)
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
@@ -578,25 +569,7 @@ async def generate(message: Message):
 
 
     
-@dp.callback_query(lambda c: c.data == "repeat_generation")
-async def repeat_generation(callback: CallbackQuery):
-    await callback.answer()
 
-    user_id = callback.from_user.id
-    reference_data = user_references.get(user_id)
-
-    if not reference_data or not reference_data.get("image") or not reference_data.get("last_prompt"):
-        await callback.message.answer("❌ Нет сохранённой генерации для повтора.")
-        return
-
-    repeat_message = callback.message.model_copy(
-        update={
-            "from_user": callback.from_user,
-            "text": reference_data["last_prompt"]
-        }
-    )
-
-    await generate(repeat_message)
 async def main():
     await dp.start_polling(bot)
 
