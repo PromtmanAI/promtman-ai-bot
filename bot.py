@@ -209,7 +209,13 @@ async def generate(message: Message):
             client.images.edit,
             model="gpt-image-1",
             image=("reference.png", reference_bytes, "image/png"),
-            prompt=message.text,
+            prompt=(
+    "Используй человека с референсного фото как основу. "
+    "Сохраняй его узнаваемость и основные черты внешности, "
+    "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
+    "Не изменяй другие черты без необходимости. "
+    "Запрос пользователя: " + message.text
+),
             size="1024x1024",
         )
 
