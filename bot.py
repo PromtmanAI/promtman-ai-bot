@@ -73,6 +73,11 @@ async def generate_button(callback: CallbackQuery):
     await callback.message.answer(
         "🎨 Напиши промт — опиши, какую картинку хочешь создать."
     ) 
+@dp.message(lambda message: message.text == "🎨 Создать изображение")
+async def generate_reference_start(message: Message):
+    await message.answer(
+        "🖼 Отправь фото, которое хочешь использовать как референс."
+    )
 @dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
     await callback.answer()
