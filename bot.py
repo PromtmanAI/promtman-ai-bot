@@ -534,7 +534,7 @@ async def generate(message: Message):
 
         await message.answer_photo(
     BufferedInputFile(image_bytes, filename="promtman_preview.png"),
-    caption="✨ Готово!"
+    caption="✨ Готово!", 
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🔄 Повторить", callback_data="repeat_generation")]])
 )
 
