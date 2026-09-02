@@ -90,7 +90,7 @@ async def buy_button(callback: CallbackQuery):
 @dp.pre_checkout_query()
 async def pre_checkout(pre_checkout_query):
     await pre_checkout_query.answer(ok=True)
-    @dp.message(lambda message: message.successful_payment is not None)
+@dp.message(lambda message: message.successful_payment is not None)
 async def successful_payment(message: Message):
     user_id = message.from_user.id
 
