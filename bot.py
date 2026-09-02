@@ -163,22 +163,22 @@ with psycopg.connect(DATABASE_URL) as conn:
             image,
             caption="✨ Готово!"
         )
-        with psycopg.connect(DATABASE_URL) as conn:
+                with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
                     cur.execute(
-                "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
-                (user_id,)
-            )
-    else:
-            cur.execute(
-                """
-                INSERT INTO users (user_id, balance)
-                VALUES (%s, 0)
-                ON CONFLICT DO NOTHING
-                """,
-                (user_id,)
-            )
+                        "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
+                        (user_id,)
+                    )
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO users (user_id, balance)
+                        VALUES (%s, 0)
+                        ON CONFLICT DO NOTHING
+                        """,
+                        (user_id,)
+                    )
         await status.delete()
 
     except Exception as e:
