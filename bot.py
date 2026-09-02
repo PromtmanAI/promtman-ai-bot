@@ -7,6 +7,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,ReplyKeyboardMarkup, KeyboardButton 
 from openai import OpenAI
 from google import genai
+from google.genai import types
 import psycopg
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -79,8 +80,35 @@ async def generate_button(callback: CallbackQuery):
     ) 
 @dp.message(lambda message: message.text == "🎨 Создать изображение")
 async def generate_reference_start(message: Message):
+    model_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
+            [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")]
+        ]
+    )
+
     await message.answer(
-        "🖼 Отправь фото, которое хочешь использовать как референс."
+        "🤖 Выбери модель для генерации:",
+        reply_markup=model_menu
+    )
+    @dp.callback_query(lambda c: c.data == "model_gpt")
+async def select_gpt(callback: CallbackQuery):
+    await callback.answer()
+    user_references[callback.from_user.id] = {"model": "gpt", "image": None}
+
+    await callback.message.answer(
+        "🖼 Отправь фото-референс для GPT Image."
+    )
+
+
+@dp.callback_query(lambda c: c.data == "model_nano_pro")
+async def select_nano_pro(callback: CallbackQuery):
+    await callback.answer()
+    user_references[callback.from_user.id] = {"model": "nano_pro", "image": None}
+
+    await callback.message.answer(
+        "🍌 Выбран Nano Banana Pro.\n\n"
+        "🖼 Отправь фото-референс."
     )
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
@@ -90,7 +118,10 @@ async def receive_reference(message: Message):
     file = await bot.get_file(photo.file_id)
     photo_bytes = await bot.download_file(file.file_path)
 
-    user_references[user_id] = photo_bytes.read()
+    if user_id not in user_references:
+        user_references[user_id] = {"model": "gpt", "image": None}
+
+user_references[user_id]["image"] = photo_bytes.read()
 
     await message.answer(
         "✅ Фото получено!\n\n"
@@ -232,7 +263,9 @@ async def generate(message: Message):
     status = await message.answer("⏳ Создаю изображение...")
 
     try:
-        reference_bytes = user_references.get(user_id)
+        reference_data = user_references.get(user_id)
+reference_bytes = reference_data.get("image") if reference_data else None
+selected_model = reference_data.get("model") if reference_data else None
 
         if not reference_bytes:
             await status.edit_text(
@@ -240,21 +273,50 @@ async def generate(message: Message):
     )
             return
 
-        result = await asyncio.to_thread(
-            client.images.edit,
-            model="gpt-image-1",
-            image=("reference.png", reference_bytes, "image/png"),
-            prompt=(
-    "Используй человека с референсного фото как основу. "
-    "Сохраняй его узнаваемость и основные черты внешности, "
-    "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
-    "Не изменяй другие черты без необходимости. "
-    "Запрос пользователя: " + message.text
-),
-            size="1024x1024",
-        )
+        if selected_model == "nano_pro":
+    interaction = await asyncio.to_thread(
+        gemini_client.interactions.create,
+        model="gemini-3-pro-image",
+        input=[
+            {
+                "type": "text",
+                "text": (
+                    "Используй человека с референсного фото как основу. "
+                    "Сохраняй его узнаваемость и основные черты внешности, "
+                    "но выполняй изменения, которые пользователь явно попросил. "
+                    "Запрос пользователя: " + message.text
+                )
+            },
+            {
+                "type": "image",
+                "data": base64.b64encode(reference_bytes).decode("utf-8"),
+                "mime_type": "image/jpeg"
+            }
+        ],
+        response_format={
+            "type": "image",
+            "image_size": "1K"
+        }
+    )
 
-        image_bytes = base64.b64decode(result.data[0].b64_json)
+    image_bytes = base64.b64decode(interaction.output_image.data)
+
+else:
+    result = await asyncio.to_thread(
+        client.images.edit,
+        model="gpt-image-1",
+        image=("reference.png", reference_bytes, "image/png"),
+        prompt=(
+            "Используй человека с референсного фото как основу. "
+            "Сохраняй его узнаваемость и основные черты внешности, "
+            "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
+            "Не изменяй другие черты без необходимости. "
+            "Запрос пользователя: " + message.text
+        ),
+        size="1024x1024",
+    )
+
+    image_bytes = base64.b64decode(result.data[0].b64_json)
 
         image = BufferedInputFile(
             image_bytes,
