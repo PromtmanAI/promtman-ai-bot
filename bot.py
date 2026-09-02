@@ -31,8 +31,14 @@ with psycopg.connect(DATABASE_URL) as conn:
     with conn.cursor() as cur:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                user_id BIGINT PRIMARY KEY
+                user_id BIGINT PRIMARY KEY,
+                balance INTEGER NOT NULL DEFAULT 0
             )
+        """)
+
+        cur.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS balance INTEGER NOT NULL DEFAULT 0
         """)
 
 @dp.message(CommandStart())
