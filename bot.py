@@ -295,7 +295,7 @@ async def generate(message: Message):
                 ],
                 response_format={
                     "type": "image",
-                    "image_size": "1K"
+                    "image_size": "2K"
                 }
             )
 
