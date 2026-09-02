@@ -430,6 +430,23 @@ async def generate(message: Message):
         await status.edit_text(
             "❌ Не удалось создать изображение. Попробуй ещё раз."
         )
+@dp.message(lambda message: message.text == "/testcredits")
+async def test_credits(message: Message):
+    user_id = message.from_user.id
+
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO users (user_id, balance)
+                VALUES (%s, 10)
+                ON CONFLICT (user_id)
+                DO UPDATE SET balance = users.balance + 10
+                """,
+                (user_id,)
+            )
+
+    await message.answer("🧪 Добавлено 10 тестовых генераций.")
 async def main():
     await dp.start_polling(bot)
 
