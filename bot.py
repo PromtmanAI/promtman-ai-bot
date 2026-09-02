@@ -87,7 +87,7 @@ async def generate(message: Message):
             image,
             caption="✨ Готово!"
         )
-            with psycopg.connect(DATABASE_URL) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
                 with conn.cursor() as cur:
                 cur.execute(
                     "INSERT INTO users (user_id) VALUES (%s) ON CONFLICT DO NOTHING",
