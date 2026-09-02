@@ -87,22 +87,57 @@ async def buy_button(callback: CallbackQuery):
             LabeledPrice(label="5 генераций", amount=50)
         ]
     )
+@dp.pre_checkout_query()
+async def pre_checkout(pre_checkout_query):
+    await pre_checkout_query.answer(ok=True)
+    @dp.message(lambda message: message.successful_payment is not None)
+async def successful_payment(message: Message):
+    user_id = message.from_user.id
+
+    if message.successful_payment.invoice_payload == "buy_5":
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO users (user_id, balance)
+                    VALUES (%s, 5)
+                    ON CONFLICT (user_id)
+                    DO UPDATE SET balance = users.balance + 5
+                    """,
+                    (user_id,)
+                )
+
+        await message.answer(
+            "✅ Оплата прошла!\n"
+            "💎 На баланс начислено 5 генераций."
+        )
 @dp.message()
 async def generate(message: Message):
     if not message.text:
         return
     user_id = message.from_user.id
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT user_id FROM users WHERE user_id = %s",
-                (user_id,)
-            )
-            if cur.fetchone():
+    use_paid = False
+
+with psycopg.connect(DATABASE_URL) as conn:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT balance FROM users WHERE user_id = %s",
+            (user_id,)
+        )
+        row = cur.fetchone()
+
+        if row:
+            balance = row[0]
+
+            if balance <= 0:
                 await message.answer(
-                    "🔒 Бесплатная генерация уже использована."
+                    "🔒 Бесплатная генерация уже использована.\n"
+                    "💎 Купи генерации, чтобы продолжить."
                 )
                 return
+
+            use_paid = True
+           
 
     
 
@@ -129,12 +164,21 @@ async def generate(message: Message):
             caption="✨ Готово!"
         )
         with psycopg.connect(DATABASE_URL) as conn:
-                with conn.cursor() as cur:
-                    cur.execute(
-                    "INSERT INTO users (user_id) VALUES (%s) ON CONFLICT DO NOTHING",
-                    (user_id,)
-                )
-
+    with conn.cursor() as cur:
+        if use_paid:
+            cur.execute(
+                "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
+                (user_id,)
+            )
+        else:
+            cur.execute(
+                """
+                INSERT INTO users (user_id, balance)
+                VALUES (%s, 0)
+                ON CONFLICT DO NOTHING
+                """,
+                (user_id,)
+            )
         await status.delete()
 
     except Exception as e:
