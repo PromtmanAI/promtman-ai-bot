@@ -121,7 +121,7 @@ async def receive_reference(message: Message):
     if user_id not in user_references:
         user_references[user_id] = {"model": "gpt", "image": None}
 
-user_references[user_id]["image"] = photo_bytes.read()
+    user_references[user_id]["image"] = photo_bytes.read()
 
     await message.answer(
         "✅ Фото получено!\n\n"
