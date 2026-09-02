@@ -230,7 +230,8 @@ async def prompt_myself(callback: CallbackQuery):
 @dp.callback_query(lambda c: c.data == "prompt_help")
 async def prompt_help(callback: CallbackQuery):
     await callback.answer()
-
+    user_references[callback.from_user.id]["prompt_help"] = True
+    
     await callback.message.answer(
         "🔥 Опиши простыми словами, что хочешь получить.\n\n"
         "Например:\n"
@@ -364,6 +365,31 @@ async def generate(message: Message):
         return
 
     user_id = message.from_user.id
+        prompt_text = message.text
+    reference_data = user_references.get(user_id)
+
+    if reference_data and reference_data.get("prompt_help"):
+        await message.answer("🔥 Улучшаю промт...")
+
+        prompt_result = await asyncio.to_thread(
+            client.responses.create,
+            model="gpt-5-mini",
+            input=(
+                "Ты профессиональный промт-инженер для генерации изображений. "
+                "Улучши запрос пользователя: добавь детали сцены, освещение, композицию, "
+                "стиль, реализм и качество, но не меняй смысл запроса. "
+                "Если используется фото-референс человека, обязательно сохраняй его узнаваемость. "
+                "Верни только готовый улучшенный промт без объяснений.\n\n"
+                "Запрос пользователя: " + message.text
+            )
+        )
+
+        prompt_text = prompt_result.output_text.strip()
+        user_references[user_id]["prompt_help"] = False
+
+        await message.answer(
+            "✨ Улучшенный промт:\n\n" + prompt_text
+        )
     use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -410,7 +436,7 @@ async def generate(message: Message):
                             "Используй человека с референсного фото как основу. "
                             "Сохраняй его узнаваемость и основные черты внешности, "
                             "но выполняй изменения, которые пользователь явно попросил. "
-                            "Запрос пользователя: " + message.text
+                            "Запрос пользователя: " + prompt_text
                         )
                     },
                     {
@@ -438,7 +464,7 @@ async def generate(message: Message):
                     "Сохраняй его узнаваемость и основные черты внешности, "
                     "но обязательно выполняй изменения внешности, которые пользователь явно попросил. "
                     "Не изменяй другие черты без необходимости. "
-                    "Запрос пользователя: " + message.text
+                    "Запрос пользователя: " + prompt_text
                 ),
                 size="1024x1024",
             )
