@@ -199,8 +199,8 @@ async def generate(message: Message):
     try:
         reference_bytes = user_references.get(user_id)
 
-if not reference_bytes:
-    await status.edit_text(
+        if not reference_bytes:
+            await status.edit_text(
         "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
     )
     return
