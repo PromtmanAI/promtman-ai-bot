@@ -58,6 +58,26 @@ async def generate_button(callback: CallbackQuery):
     await callback.message.answer(
         "🎨 Напиши промт — опиши, какую картинку хочешь создать."
     ) 
+    @dp.callback_query(lambda c: c.data == "profile")
+async def profile_button(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT balance FROM users WHERE user_id = %s",
+                (user_id,)
+            )
+            row = cur.fetchone()
+
+    balance = row[0] if row else 0
+
+    await callback.message.answer(
+        f"👤 Профиль\n\n"
+        f"💎 Генераций на балансе: {balance}"
+    )
 @dp.callback_query(lambda c: c.data == "buy")
 async def buy_button(callback: CallbackQuery):
     await callback.answer()
