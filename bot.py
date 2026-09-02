@@ -62,9 +62,9 @@ async def start(message: Message):
         "👋 Привет! Я Promtman AI.\n\n"
         "🎨 Напиши, какую картинку хочешь создать.\n\n"
         "Например:\n"
-        "Белый Mercedes ночью в Дубае, cinematic photo", 
-    reply_markup=menu
-     )
+        "Белый Mercedes ночью в Дубае, cinematic photo",
+        reply_markup=reply_menu
+    )
 
 
 @dp.callback_query(lambda c: c.data == "generate")
