@@ -578,7 +578,26 @@ async def generate(message: Message):
         )
 
 
-    await message.answer("🧪 Добавлено 10 тестовых генераций.")
+    
+@dp.callback_query(lambda c: c.data == "repeat_generation")
+async def repeat_generation(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+    reference_data = user_references.get(user_id)
+
+    if not reference_data or not reference_data.get("image") or not reference_data.get("last_prompt"):
+        await callback.message.answer("❌ Нет сохранённой генерации для повтора.")
+        return
+
+    repeat_message = callback.message.model_copy(
+        update={
+            "from_user": callback.from_user,
+            "text": reference_data["last_prompt"]
+        }
+    )
+
+    await generate(repeat_message)
 async def main():
     await dp.start_polling(bot)
 
