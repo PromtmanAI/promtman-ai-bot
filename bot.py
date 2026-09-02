@@ -69,6 +69,11 @@ async def generate(message: Message):
 
     try:
         result = await asyncio.to_thread(
+                        client.images.generate,
+            model="gpt-image-1",
+            prompt=message.text,
+            size="1024x1024",
+        )
             
 
         image_bytes = base64.b64decode(result.data[0].b64_json)
