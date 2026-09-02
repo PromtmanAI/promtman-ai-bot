@@ -104,11 +104,84 @@ async def select_gpt(callback: CallbackQuery):
 @dp.callback_query(lambda c: c.data == "model_nano_pro")
 async def select_nano_pro(callback: CallbackQuery):
     await callback.answer()
-    user_references[callback.from_user.id] = {"model": "nano_pro", "image": None}
+
+    quality_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1K", callback_data="nano_1k"),
+                InlineKeyboardButton(text="2K", callback_data="nano_2k"),
+                InlineKeyboardButton(text="4K", callback_data="nano_4k"),
+            ]
+        ]
+    )
 
     await callback.message.answer(
         "🍌 Выбран Nano Banana Pro.\n\n"
-        "🖼 Отправь фото-референс."
+        "Выбери качество:",
+        reply_markup=quality_menu
+    )
+@dp.callback_query(lambda c: c.data in ["nano_1k", "nano_2k", "nano_4k"])
+async def select_nano_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "nano_1k": "1K",
+        "nano_2k": "2K",
+        "nano_4k": "4K",
+    }
+
+    quality = quality_map[callback.data]
+
+    user_references[callback.from_user.id] = {
+        "model": "nano_pro",
+        "image": None,
+        "quality": quality
+    }
+
+    format_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="1:1", callback_data="ratio_1_1"),
+            InlineKeyboardButton(text="3:4", callback_data="ratio_3_4"),
+            InlineKeyboardButton(text="4:3", callback_data="ratio_4_3"),
+        ],
+        [
+            InlineKeyboardButton(text="9:16", callback_data="ratio_9_16"),
+            InlineKeyboardButton(text="16:9", callback_data="ratio_16_9"),
+        ]
+    ]
+)
+
+    await callback.message.answer(
+    f"✅ Качество: {quality}\n\n"
+    "📐 Теперь выбери формат изображения:",
+    reply_markup=format_menu
+)
+@dp.callback_query(lambda c: c.data in [
+    "ratio_1_1",
+    "ratio_3_4",
+    "ratio_4_3",
+    "ratio_9_16",
+    "ratio_16_9"
+])
+async def select_nano_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "ratio_1_1": "1:1",
+        "ratio_3_4": "3:4",
+        "ratio_4_3": "4:3",
+        "ratio_9_16": "9:16",
+        "ratio_16_9": "16:9",
+    }
+
+    ratio = ratio_map[callback.data]
+
+    user_references[callback.from_user.id]["ratio"] = ratio
+
+    await callback.message.answer(
+        f"✅ Формат: {ratio}\n\n"
+        "🖼 Теперь отправь фото-референс."
     )
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
@@ -295,7 +368,8 @@ async def generate(message: Message):
                 ],
                 response_format={
                     "type": "image",
-                    "image_size": "2K"
+                    "image_size": reference_data.get("quality", "1K"), 
+                    "aspect_ratio": reference_data.get("ratio", "1:1")
                 }
             )
 
