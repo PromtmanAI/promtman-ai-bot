@@ -164,13 +164,13 @@ with psycopg.connect(DATABASE_URL) as conn:
             caption="✨ Готово!"
         )
         with psycopg.connect(DATABASE_URL) as conn:
-    with conn.cursor() as cur:
-        if use_paid:
+            with conn.cursor() as cur:
+                if use_paid:
             cur.execute(
                 "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
                 (user_id,)
             )
-        else:
+    else:
             cur.execute(
                 """
                 INSERT INTO users (user_id, balance)
