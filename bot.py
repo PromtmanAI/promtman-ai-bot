@@ -4,7 +4,7 @@ import base64
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice 
 from openai import OpenAI
 import psycopg
 
@@ -67,6 +67,19 @@ async def buy_button(callback: CallbackQuery):
     await callback.message.answer(
         "💎 Выбери пакет генераций:",
         reply_markup=buy_menu
+    )
+    @dp.callback_query(lambda c: c.data == "buy_5")
+async def buy_5(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer_invoice(
+        title="5 генераций",
+        description="Пакет из 5 генераций изображений",
+        payload="buy_5",
+        currency="XTR",
+        prices=[
+            LabeledPrice(label="5 генераций", amount=50)
+        ]
     )
 @dp.message()
 async def generate(message: Message):
