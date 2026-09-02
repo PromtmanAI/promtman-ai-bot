@@ -4,7 +4,7 @@ import base64
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from openai import OpenAI
 import psycopg
 
@@ -46,6 +46,12 @@ async def start(message: Message):
      )
 
 
+@dp.callback_query(lambda c: c.data == "generate")
+async def generate_button(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "🎨 Напиши промт — опиши, какую картинку хочешь создать."
+    ) 
 @dp.message()
 async def generate(message: Message):
     if not message.text:
