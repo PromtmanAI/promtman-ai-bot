@@ -486,7 +486,14 @@ async def generate(message: Message):
                 fal_client.subscribe,
                 "bytedance/seedream/v5/pro/edit",
                 arguments={
-                    "prompt": prompt_text,
+                    "prompt": (
+    "Используй человека с референсного фото как точную основу. "
+    "Максимально сохраняй идентичность человека: форму лица, глаза, нос, губы, "
+    "линию челюсти, пропорции и другие узнаваемые черты. "
+    "Не меняй лицо и внешность без прямой просьбы пользователя. "
+    "Изменяй только то, что пользователь явно попросил изменить. "
+    "Запрос пользователя: " + prompt_text
+),
                     "image_urls": [reference_data_uri],
                     "num_images": 1,
                     "output_format": "jpeg"
