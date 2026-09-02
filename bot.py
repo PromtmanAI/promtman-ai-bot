@@ -375,8 +375,8 @@ async def test_credits(message: Message):
                 (user_id,)
             )
     await message.answer("🧪 Добавлено 10 тестовых генераций.")
-    @dp.callback_query(lambda c: c.data == "repeat_generation")
-async def repeat_generation(callback: CallbackQuery):
+   @dp.callback_query(lambda c: c.data == "repeat_generation")
+   async def repeat_generation(callback: CallbackQuery):
     await callback.answer()
 
     user_id = callback.from_user.id
