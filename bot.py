@@ -4,7 +4,7 @@ import base64
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice 
+from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,ReplyKeyboardMarkup, KeyboardButton 
 from openai import OpenAI
 import psycopg
 
@@ -17,6 +17,18 @@ dp = Dispatcher()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 menu = InlineKeyboardMarkup(
+    reply_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="🎨 Создать изображение"),
+            KeyboardButton(text="💎 Купить генерации"),
+        ],
+        [
+            KeyboardButton(text="👤 Профиль"),
+        ]
+    ],
+    resize_keyboard=True
+)
     inline_keyboard=[
         [
             InlineKeyboardButton(text="🎨 Создать изображение", callback_data="generate"),
