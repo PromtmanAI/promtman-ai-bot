@@ -203,7 +203,7 @@ async def generate(message: Message):
             await status.edit_text(
         "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
     )
-                return
+            return
 
         result = await asyncio.to_thread(
             client.images.edit,
