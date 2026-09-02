@@ -407,7 +407,6 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-        if reference_data:
         reference_data["last_prompt"] = prompt_text
     use_paid = False
 
