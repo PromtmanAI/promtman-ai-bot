@@ -69,7 +69,7 @@ async def buy_button(callback: CallbackQuery):
         reply_markup=buy_menu
     )
     @dp.callback_query(lambda c: c.data == "buy_5")
-async def buy_5(callback: CallbackQuery):
+    async def buy_5(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
