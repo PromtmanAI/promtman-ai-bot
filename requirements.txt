@@ -2,3 +2,4 @@ aiogram
 openai
 psycopg[binary]
 google-genai
+fal-client
