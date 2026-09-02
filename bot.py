@@ -91,7 +91,7 @@ async def generate_reference_start(message: Message):
         "🤖 Выбери модель для генерации:",
         reply_markup=model_menu
     )
-    @dp.callback_query(lambda c: c.data == "model_gpt")
+@dp.callback_query(lambda c: c.data == "model_gpt")
 async def select_gpt(callback: CallbackQuery):
     await callback.answer()
     user_references[callback.from_user.id] = {"model": "gpt", "image": None}
