@@ -166,7 +166,7 @@ with psycopg.connect(DATABASE_URL) as conn:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 if use_paid:
-        cur.execute(
+                    cur.execute(
                 "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
                 (user_id,)
             )
