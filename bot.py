@@ -407,7 +407,7 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-        reference_data["last_prompt"] = prompt_text
+        
     use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -436,6 +436,8 @@ async def generate(message: Message):
         reference_data = user_references.get(user_id)
         reference_bytes = reference_data.get("image") if reference_data else None
         selected_model = reference_data.get("model") if reference_data else None
+              if reference_data:
+            reference_data["last_prompt"] = prompt_text
 
         if not reference_bytes:
             await status.edit_text(
