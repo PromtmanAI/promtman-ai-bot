@@ -262,7 +262,7 @@ async def generate(message: Message):
 
     status = await message.answer("⏳ Создаю изображение...")
 
-        try:
+    try:
         reference_data = user_references.get(user_id)
         reference_bytes = reference_data.get("image") if reference_data else None
         selected_model = reference_data.get("model") if reference_data else None
