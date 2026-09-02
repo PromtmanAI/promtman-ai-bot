@@ -481,8 +481,7 @@ async def generate(message: Message):
 )
 
         await message.answer_document(
-    BufferedInputFile(image_bytes, filename="promtman_2K.png"),
-    caption="📁 Оригинал в полном качестве"
+    BufferedInputFile(image_bytes, filename=f"promtman_{reference_data.get('quality', '1K')}.png"),
 )
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
