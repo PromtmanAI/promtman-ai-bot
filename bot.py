@@ -131,6 +131,20 @@ async def profile_button(callback: CallbackQuery):
         f"👤 Профиль\n\n"
         f"💎 Генераций на балансе: {balance}"
     )
+@dp.message(lambda message: message.text == "💎 Купить генерации")
+async def buy_text(message: Message):
+    buy_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="5 генераций — 50 ⭐", callback_data="buy_5")],
+            [InlineKeyboardButton(text="10 генераций — 90 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="25 генераций — 200 ⭐", callback_data="buy_25")]
+        ]
+    )
+
+    await message.answer(
+        "💎 Выбери пакет генераций:",
+        reply_markup=buy_menu
+    )
 @dp.callback_query(lambda c: c.data == "buy")
 async def buy_button(callback: CallbackQuery):
     await callback.answer()
