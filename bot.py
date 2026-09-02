@@ -197,12 +197,22 @@ async def generate(message: Message):
     status = await message.answer("⏳ Создаю изображение...")
 
     try:
-        result = await asyncio.to_thread(
-            client.images.generate,
-            model="gpt-image-1",
-            prompt=message.text,
-            size="1024x1024",
-        )
+        reference_bytes = user_references.get(user_id)
+
+if not reference_bytes:
+    await status.edit_text(
+        "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
+    )
+    return
+
+result = await asyncio.to_thread(
+    client.images.edit,
+    model="gpt-image-1",
+    image=("reference.png", reference_bytes, "image/png"),
+    prompt=message.text,
+    size="1024x1024",
+)
+     
 
         image_bytes = base64.b64decode(result.data[0].b64_json)
 
@@ -232,8 +242,9 @@ async def generate(message: Message):
                         """,
                         (user_id,)
                     )
-
+        user_references.pop(user_id, None)
         await status.delete()
+
 
     except Exception as e:
         print(e)
