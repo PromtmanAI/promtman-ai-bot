@@ -445,6 +445,11 @@ async def successful_payment(message: Message):
 @dp.message(lambda message: message.text == "/testcredits")
 async def test_credits(message: Message):
     user_id = message.from_user.id
+    allowed_users = [8328359349, 1905941634]
+
+if user_id not in allowed_users:
+    await message.answer("❌ Эта команда недоступна.")
+    return
 
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
