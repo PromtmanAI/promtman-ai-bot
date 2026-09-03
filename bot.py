@@ -207,7 +207,7 @@ async def receive_reference(message: Message):
     file = await bot.get_file(photo.file_id)
     photo_bytes = await bot.download_file(file.file_path)
 
-        if user_id not in user_references:
+    if user_id not in user_references:
         user_references[user_id] = {"model": "gpt", "images": []}
 
     if "images" not in user_references[user_id]:
