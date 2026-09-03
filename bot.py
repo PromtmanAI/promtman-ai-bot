@@ -4,7 +4,7 @@ import base64
 import urllib.request
 
 from aiogram import Bot, Dispatcher
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery,BufferedInputFile, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,ReplyKeyboardMarkup, KeyboardButton 
 from openai import OpenAI
 from google import genai
@@ -442,7 +442,7 @@ async def successful_payment(message: Message):
             "✅ Оплата прошла!\n"
             "💎 На баланс начислено 5 генераций."
         )
-@dp.message(lambda message: message.text == "/testcredits")
+@dp.message(Command("testcredits"))
 async def test_credits(message: Message):
     user_id = message.from_user.id
     allowed_users = [8328359349, 1905941634]
