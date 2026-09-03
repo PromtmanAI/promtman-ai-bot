@@ -710,8 +710,8 @@ async def generate(message: Message):
             payload = {
                 "prompt": prompt_text,
                 "images": reference_data_uris,
-                "aspect_ratio": "1:1",
-                "resolution": "1k",
+                "aspect_ratio": reference_data.get("ratio", "1:1"),
+"resolution": reference_data.get("quality", "1k"),
                 "output_format": "jpeg",
                 "prompt_optimization_mode": "standard"
             }
