@@ -690,7 +690,7 @@ async def generate(message: Message):
                     timeout=60
                 ).read()
             )
-         else:
+        else:
             result = await asyncio.to_thread(
                 client.images.edit,
                 model="gpt-image-1",
