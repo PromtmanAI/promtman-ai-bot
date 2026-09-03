@@ -21,6 +21,7 @@ FAL_KEY = os.getenv("FAL_KEY")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 user_references = {}
+media_group_tasks = {}
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
@@ -199,9 +200,53 @@ async def select_nano_ratio(callback: CallbackQuery):
         f"✅ Формат: {ratio}\n\n"
         "🖼 Теперь отправь фото-референс."
     )
+async def finish_media_group(message: Message, user_id: int, media_group_id: str):
+    try:
+        await asyncio.sleep(1.5)
+
+        reference_data = user_references.get(user_id)
+        if not reference_data:
+            return
+
+        images = reference_data.get("images", [])
+
+        prompt_menu = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Готово, перейти к промту",
+                        callback_data="references_done"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="✍️ Написать свой промт",
+                        callback_data="prompt_myself"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="🔥 Помоги составить промт",
+                        callback_data="prompt_help"
+                    )
+                ]
+            ]
+        )
+
+        await message.answer(
+            f"✅ Получено фото: {len(images)}\n\n"
+            "Что делаем дальше?",
+            reply_markup=prompt_menu
+        )
+
+    except asyncio.CancelledError:
+        pass
+    finally:
+        media_group_tasks.pop(media_group_id, None)
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
     user_id = message.from_user.id
+        media_group_id = message.media_group_id
 
     photo = message.photo[-1]
     file = await bot.get_file(photo.file_id)
@@ -218,6 +263,14 @@ async def receive_reference(message: Message):
         return
 
     user_references[user_id]["images"].append(photo_bytes.read())
+    if media_group_id:
+        if media_group_id in media_group_tasks:
+            media_group_tasks[media_group_id].cancel()
+
+        media_group_tasks[media_group_id] = asyncio.create_task(
+            finish_media_group(message, user_id, media_group_id)
+        )
+        return
 
     prompt_menu = InlineKeyboardMarkup(
         inline_keyboard=[
