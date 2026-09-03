@@ -246,7 +246,7 @@ async def finish_media_group(message: Message, user_id: int, media_group_id: str
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
     user_id = message.from_user.id
-        media_group_id = message.media_group_id
+    media_group_id = message.media_group_id
 
     photo = message.photo[-1]
     file = await bot.get_file(photo.file_id)
