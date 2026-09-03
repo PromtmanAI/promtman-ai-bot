@@ -120,7 +120,19 @@ async def select_seedream(callback: CallbackQuery):
         "💥 Выбран Seedream 5.0 Pro.\n\n"
         "🖼 Отправь фото-референс."
     )
+@dp.callback_query(lambda c: c.data == "model_seedream_ws")
+async def select_seedream_ws(callback: CallbackQuery):
+    await callback.answer()
 
+    user_references[callback.from_user.id] = {
+        "model": "seedream_ws",
+        "images": []
+    }
+
+    await callback.message.answer(
+        "🔥 Выбран Seedream 5.0 Pro WaveSpeed.\n\n"
+        "🖼 Отправь фото-референс."
+    )
 @dp.callback_query(lambda c: c.data == "model_nano_pro")
 async def select_nano_pro(callback: CallbackQuery):
     await callback.answer()
@@ -610,7 +622,75 @@ async def generate(message: Message):
                 ).read()
             )
 
-        else:
+                elif selected_model == "seedream_ws":
+            reference_data_uris = [
+                "data:image/jpeg;base64,"
+                + base64.b64encode(img).decode("utf-8")
+                for img in reference_images
+            ]
+
+            headers = {
+                "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+                "Content-Type": "application/json"
+            }
+
+            payload = {
+                "prompt": prompt_text,
+                "images": reference_data_uris,
+                "aspect_ratio": "1:1",
+                "resolution": "1k",
+                "output_format": "jpeg",
+                "prompt_optimization_mode": "standard"
+            }
+
+            request = urllib.request.Request(
+                "https://api.wavespeed.ai/api/v3/bytedance/seedream-v5.0-pro/edit",
+                data=json.dumps(payload).encode("utf-8"),
+                headers=headers,
+                method="POST"
+            )
+
+            response = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(request, timeout=60).read()
+            )
+
+            task_data = json.loads(response)
+            task_id = task_data["data"]["id"]
+
+            while True:
+                await asyncio.sleep(2)
+
+                result_request = urllib.request.Request(
+                    f"https://api.wavespeed.ai/api/v3/predictions/{task_id}/result",
+                    headers={"Authorization": f"Bearer {WAVESPEED_API_KEY}"}
+                )
+
+                result_response = await asyncio.to_thread(
+                    lambda: urllib.request.urlopen(
+                        result_request,
+                        timeout=30
+                    ).read()
+                )
+
+                result_data = json.loads(result_response)["data"]
+                task_status = result_data["status"]
+
+                if task_status == "completed":
+                    image_url = result_data["outputs"][0]
+                    break
+
+                if task_status in {"failed", "cancelled", "timeout", "deleted"}:
+                    raise RuntimeError(
+                        result_data.get("error") or f"WaveSpeed: {task_status}"
+                    )
+
+            image_bytes = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(
+                    image_url,
+                    timeout=60
+                ).read()
+            )
+                else:
             result = await asyncio.to_thread(
                 client.images.edit,
                 model="gpt-image-1",
