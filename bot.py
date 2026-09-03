@@ -124,14 +124,87 @@ async def select_seedream(callback: CallbackQuery):
 async def select_seedream_ws(callback: CallbackQuery):
     await callback.answer()
 
-    user_references[callback.from_user.id] = {
-        "model": "seedream_ws",
-        "images": []
-    }
+    quality_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1K", callback_data="ws_1k"),
+                InlineKeyboardButton(text="1.5K", callback_data="ws_1_5k"),
+                InlineKeyboardButton(text="2K", callback_data="ws_2k"),
+            ]
+        ]
+    )
 
     await callback.message.answer(
         "🔥 Выбран Seedream 5.0 Pro WaveSpeed.\n\n"
-        "🖼 Отправь фото-референс."
+        "Выбери качество:",
+        reply_markup=quality_menu
+    )
+    @dp.callback_query(lambda c: c.data in ["ws_1k", "ws_1_5k", "ws_2k"])
+async def select_seedream_ws_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "ws_1k": "1k",
+        "ws_1_5k": "1.5k",
+        "ws_2k": "2k",
+    }
+
+    quality = quality_map[callback.data]
+
+    user_references[callback.from_user.id] = {
+        "model": "seedream_ws",
+        "images": [],
+        "quality": quality
+    }
+
+    format_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1:1", callback_data="ws_ratio_1_1"),
+                InlineKeyboardButton(text="3:4", callback_data="ws_ratio_3_4"),
+                InlineKeyboardButton(text="4:3", callback_data="ws_ratio_4_3"),
+            ],
+            [
+                InlineKeyboardButton(text="9:16", callback_data="ws_ratio_9_16"),
+                InlineKeyboardButton(text="16:9", callback_data="ws_ratio_16_9"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "📐 Теперь выбери формат изображения:",
+        reply_markup=format_menu
+    )
+    @dp.callback_query(
+    lambda c: c.data in [
+        "ws_ratio_1_1",
+        "ws_ratio_3_4",
+        "ws_ratio_4_3",
+        "ws_ratio_9_16",
+        "ws_ratio_16_9",
+    ]
+)
+async def select_seedream_ws_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "ws_ratio_1_1": "1:1",
+        "ws_ratio_3_4": "3:4",
+        "ws_ratio_4_3": "4:3",
+        "ws_ratio_9_16": "9:16",
+        "ws_ratio_16_9": "16:9",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери качество.")
+        return
+
+    user_references[user_id]["ratio"] = ratio_map[callback.data]
+
+    await callback.message.answer(
+        "🖼 Теперь отправь фото-референс."
     )
 @dp.callback_query(lambda c: c.data == "model_nano_pro")
 async def select_nano_pro(callback: CallbackQuery):
