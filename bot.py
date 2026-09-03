@@ -219,28 +219,28 @@ async def receive_reference(message: Message):
 
     user_references[user_id]["images"].append(photo_bytes.read())
 
-    prompt_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
+        prompt_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
             [
-    InlineKeyboardButton(
-        text="✅ Готово, перейти к промту",
-        callback_data="references_done"
-    )
-],
-            InlineKeyboardButton(
-                text="✍️ Написать свой промт",
-                callback_data="prompt_myself"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text="🔥 Помоги составить промт",
-                callback_data="prompt_help"
-            )
+                InlineKeyboardButton(
+                    text="✅ Готово, перейти к промту",
+                    callback_data="references_done"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✍️ Написать свой промт",
+                    callback_data="prompt_myself"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔥 Помоги составить промт",
+                    callback_data="prompt_help"
+                )
+            ]
         ]
-    ]
-)
+        )
 
     await message.answer(
     "✅ Фото получено!\n\n"
