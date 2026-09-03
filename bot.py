@@ -139,7 +139,7 @@ async def select_seedream_ws(callback: CallbackQuery):
         "Выбери качество:",
         reply_markup=quality_menu
     )
-    @dp.callback_query(lambda c: c.data in ["ws_1k", "ws_1_5k", "ws_2k"])
+@dp.callback_query(lambda c: c.data in ["ws_1k", "ws_1_5k", "ws_2k"])
 async def select_seedream_ws_quality(callback: CallbackQuery):
     await callback.answer()
 
