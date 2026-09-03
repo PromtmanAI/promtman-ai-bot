@@ -2,6 +2,7 @@ import os
 import asyncio
 import base64
 import urllib.request
+import json
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
@@ -17,6 +18,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 FAL_KEY = os.getenv("FAL_KEY")
+WAVESPEED_API_KEY = os.getenv("WAVESPEED_API_KEY")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -89,6 +91,7 @@ async def generate_reference_start(message: Message):
             [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
             [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
             [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")]
+            [InlineKeyboardButton(text="🔥 Seedream 5.0 Pro WaveSpeed", callback_data="model_seedream_ws")]
         ]
     )
 
