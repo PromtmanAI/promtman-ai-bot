@@ -614,7 +614,7 @@ async def repeat_generation(callback: CallbackQuery):
     user_id = callback.from_user.id
     reference_data = user_references.get(user_id)
 
-    if not reference_data or not reference_data.get("image") or not reference_data.get("last_prompt"):
+    if not reference_data or not reference_data.get("images") or not reference_data.get("last_prompt"):
         await callback.message.answer("❌ Нет сохранённой генерации для повтора.")
         return
 
