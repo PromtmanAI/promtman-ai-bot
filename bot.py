@@ -248,7 +248,7 @@ async def receive_reference(message: Message):
     reply_markup=prompt_menu
 )
     @dp.callback_query(lambda c: c.data == "references_done")
-async def references_done(callback: CallbackQuery):
+    async def references_done(callback: CallbackQuery):
     await callback.answer()
 
     user_id = callback.from_user.id
