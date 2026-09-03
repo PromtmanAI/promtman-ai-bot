@@ -90,7 +90,7 @@ async def generate_reference_start(message: Message):
         inline_keyboard=[
             [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
             [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
-            [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")]
+            [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")], 
             [InlineKeyboardButton(text="🔥 Seedream 5.0 Pro WaveSpeed", callback_data="model_seedream_ws")]
         ]
     )
