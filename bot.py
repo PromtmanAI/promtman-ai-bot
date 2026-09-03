@@ -622,7 +622,7 @@ async def generate(message: Message):
                 ).read()
             )
 
-                elif selected_model == "seedream_ws":
+        elif selected_model == "seedream_ws":
             reference_data_uris = [
                 "data:image/jpeg;base64,"
                 + base64.b64encode(img).decode("utf-8")
