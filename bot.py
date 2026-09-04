@@ -1485,6 +1485,14 @@ async def generate(message: Message):
                         """,
                         (user_id,)
                     )
+                    cur.execute(
+                """
+                UPDATE users
+                SET images_created = images_created + 1
+                WHERE user_id = %s
+                """,
+                (user_id,)
+            )
         
         await status.delete()
 
