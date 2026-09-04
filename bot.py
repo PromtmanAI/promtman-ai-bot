@@ -1350,8 +1350,19 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-        
-    use_paid = False
+     reference_data = user_references.get(user_id)
+selected_model = reference_data.get("model") if reference_data else None
+quality = reference_data.get("quality", "1K") if reference_data else "1K"
+
+token_cost = 1
+
+if selected_model == "nano_pro":
+    token_cost = 4 if quality == "4K" else 2
+elif selected_model == "seedream":
+    token_cost = 2 if quality == "2K" else 1
+elif selected_model == "seedream_ws":
+    token_cost = 2 if quality == "2K" else 1   
+use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
@@ -1364,11 +1375,13 @@ async def generate(message: Message):
             if row:
                 balance = row[0]
 
-                if balance <= 0:
+                if balance < token_cost:
                     await message.answer(
-                        "🔒 Бесплатная генерация уже использована.\n"
-                        "💎 Купи генерации, чтобы продолжить."
-                    )
+    f"❌ Недостаточно токенов.\n\n"
+    f"💠 Нужно: {token_cost}\n"
+    f"💠 На балансе: {balance}\n\n"
+    f"Пополните баланс, чтобы продолжить."
+                )
                     return
 
                 use_paid = True
@@ -1566,11 +1579,21 @@ async def generate(message: Message):
 )
 
         with psycopg.connect(DATABASE_URL) as conn:
+            token_cost = 1
+
+if selected_model == "nano_pro":
+    token_cost = 4 if reference_data.get("quality") == "4K" else 2
+
+elif selected_model == "seedream":
+    token_cost = 2 if reference_data.get("quality") == "2K" else 1
+
+elif selected_model == "seedream_ws":
+    token_cost = 2 if reference_data.get("quality") == "2K" else 1
             with conn.cursor() as cur:
                 if use_paid:
                     cur.execute(
-                        "UPDATE users SET balance = balance - 1 WHERE user_id = %s",
-                        (user_id,)
+                        "UPDATE users SET balance = balance - %s WHERE user_id = %s",
+                        (token_cost, user_id)
                     )
                 else:
                     cur.execute(
