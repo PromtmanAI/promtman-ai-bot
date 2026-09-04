@@ -1578,23 +1578,23 @@ use_paid = False
     BufferedInputFile(image_bytes, filename=f"promtman_{reference_data.get('quality', '1K')}.png"),
 )
 
-        with psycopg.connect(DATABASE_URL) as conn:
-            token_cost = 1
+     
+    with psycopg.connect(DATABASE_URL) as conn:
+    token_cost = 1
 
-if selected_model == "nano_pro":
-    token_cost = 4 if reference_data.get("quality") == "4K" else 2
+    if selected_model == "nano_pro":
+        token_cost = 4 if reference_data.get("quality") == "4K" else 2
+    elif selected_model == "seedream":
+        token_cost = 2 if reference_data.get("quality") == "2K" else 1
+    elif selected_model == "seedream_ws":
+        token_cost = 2 if reference_data.get("quality") == "2K" else 1
 
-elif selected_model == "seedream":
-    token_cost = 2 if reference_data.get("quality") == "2K" else 1
-
-elif selected_model == "seedream_ws":
-    token_cost = 2 if reference_data.get("quality") == "2K" else 1
-            with conn.cursor() as cur:
-                if use_paid:
-                    cur.execute(
-                        "UPDATE users SET balance = balance - %s WHERE user_id = %s",
-                        (token_cost, user_id)
-                    )
+    with conn.cursor() as cur:
+        if use_paid:
+            cur.execute(
+                "UPDATE users SET balance = balance - %s WHERE user_id = %s",
+                (token_cost, user_id)
+            )
                 else:
                     cur.execute(
                         """
