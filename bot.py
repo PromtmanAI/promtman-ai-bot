@@ -1350,7 +1350,7 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-     reference_data = user_references.get(user_id)
+reference_data = user_references.get(user_id)
 selected_model = reference_data.get("model") if reference_data else None
 quality = reference_data.get("quality", "1K") if reference_data else "1K"
 
