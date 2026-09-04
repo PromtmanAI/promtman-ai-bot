@@ -468,6 +468,138 @@ async def receive_kling_photo(message: Message):
         "✅ Фото получено.\n\n"
         "✍️ Теперь напиши, что должно происходить в видео."
     )
+@dp.message(
+    lambda message:
+        message.photo
+        and message.from_user.id in user_references
+        and user_references[message.from_user.id].get("video_model") == "seedance"
+)
+async def receive_seedance_photo(message: Message):
+    user_id = message.from_user.id
+    data = user_references[user_id]
+
+    if len(data["video_images"]) >= 30:
+        await message.answer("⚠️ Можно добавить максимум 30 фото.")
+        return
+
+    photo = await bot.download(message.photo[-1])
+    data["video_images"].append(photo.read())
+
+    done_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Готово, продолжить",
+                    callback_data="seedance_refs_done"
+                )
+            ]
+        ]
+    )
+
+    await message.answer(
+        f"✅ Добавлено фото: {len(data['video_images'])}/30\n\n"
+        "Можешь отправить ещё или нажать «Готово».",
+        reply_markup=done_menu
+    )
+@dp.callback_query(lambda c: c.data == "seedance_refs_done")
+async def seedance_refs_done(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+    data = user_references.get(user_id)
+
+    if not data or not data.get("video_images"):
+        await callback.message.answer("❌ Сначала отправь хотя бы одно фото.")
+        return
+
+    duration_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="5 сек", callback_data="seedance_5"),
+                InlineKeyboardButton(text="10 сек", callback_data="seedance_10"),
+            ],
+            [
+                InlineKeyboardButton(text="15 сек", callback_data="seedance_15"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        f"✅ Фото загружено: {len(data['video_images'])}\n\n"
+        "🎬 Выбери длительность видео:",
+        reply_markup=duration_menu
+    )
+@dp.callback_query(
+    lambda c: c.data in [
+        "seedance_5",
+        "seedance_10",
+        "seedance_15",
+    ]
+)
+async def select_seedance_duration(callback: CallbackQuery):
+    await callback.answer()
+
+    duration_map = {
+        "seedance_5": 5,
+        "seedance_10": 10,
+        "seedance_15": 15,
+    }
+
+    user_id = callback.from_user.id
+    user_references[user_id]["video_duration"] = duration_map[callback.data]
+
+    format_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="📱 9:16", callback_data="seedance_ratio_9_16"),
+                InlineKeyboardButton(text="🖥 16:9", callback_data="seedance_ratio_16_9"),
+            ],
+            [
+                InlineKeyboardButton(text="⬜ 1:1", callback_data="seedance_ratio_1_1"),
+                InlineKeyboardButton(text="📸 4:3", callback_data="seedance_ratio_4_3"),
+            ],
+            [
+                InlineKeyboardButton(text="📱 3:4", callback_data="seedance_ratio_3_4"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "📐 Выбери формат видео:",
+        reply_markup=format_menu
+    )
+@dp.callback_query(
+    lambda c: c.data in [
+        "seedance_ratio_9_16",
+        "seedance_ratio_16_9",
+        "seedance_ratio_1_1",
+        "seedance_ratio_4_3",
+        "seedance_ratio_3_4",
+    ]
+)
+async def select_seedance_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "seedance_ratio_9_16": "9:16",
+        "seedance_ratio_16_9": "16:9",
+        "seedance_ratio_1_1": "1:1",
+        "seedance_ratio_4_3": "4:3",
+        "seedance_ratio_3_4": "3:4",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери Seedance 2.5.")
+        return
+
+    user_references[user_id]["video_ratio"] = ratio_map[callback.data]
+
+    await callback.message.answer(
+        "✅ Формат выбран.\n\n"
+        "✍️ Теперь напиши, что должно происходить в видео."
+    )
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
     user_id = message.from_user.id
