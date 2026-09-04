@@ -75,7 +75,7 @@ async def video_start(message: Message):
         "🎬 Выбери модель для видео:",
         reply_markup=video_menu
     )
-    @dp.callback_query(lambda c: c.data == "video_kling")
+@dp.callback_query(lambda c: c.data == "video_kling")
 async def select_video_kling(callback: CallbackQuery):
     await callback.answer()
 
@@ -99,7 +99,7 @@ async def select_video_kling(callback: CallbackQuery):
         reply_markup=duration_menu
     )
     
-    @dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
+@dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
 async def select_kling_duration(callback: CallbackQuery):
     await callback.answer()
 
