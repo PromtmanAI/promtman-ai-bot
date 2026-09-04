@@ -636,7 +636,94 @@ async def test_credits(message: Message):
                 (user_id,)
             )
     await message.answer("🧪 Добавлено 10 тестовых генераций.")
+@dp.message(
+    lambda message:
+        message.text
+        and message.from_user.id in user_references
+        and user_references[message.from_user.id].get("video_model") == "kling"
+        and user_references[message.from_user.id].get("video_image") is not None
+)
+async def generate_kling_video(message: Message):
+    user_id = message.from_user.id
+    data = user_references[user_id]
 
+    status = await message.answer("🎬 Создаю видео...")
+
+    try:
+        image_data_uri = (
+            "data:image/jpeg;base64,"
+            + base64.b64encode(data["video_image"]).decode("utf-8")
+        )
+
+        headers = {
+            "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "prompt": message.text,
+            "image": image_data_uri,
+            "duration": data.get("video_duration", 5),
+            "guidance_scale": 0.5
+        }
+
+        request = urllib.request.Request(
+            "https://api.wavespeed.ai/api/v3/kwaivgi/kling-v2.5-turbo-pro/image-to-video",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+
+        response = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(request, timeout=60).read()
+        )
+
+        task_data = json.loads(response)
+        task_id = task_data["data"]["id"]
+
+        while True:
+            await asyncio.sleep(3)
+
+            result_request = urllib.request.Request(
+                f"https://api.wavespeed.ai/api/v3/predictions/{task_id}/result",
+                headers={"Authorization": f"Bearer {WAVESPEED_API_KEY}"}
+            )
+
+            result_response = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(
+                    result_request,
+                    timeout=30
+                ).read()
+            )
+
+            result_data = json.loads(result_response)["data"]
+            task_status = result_data["status"]
+
+            if task_status == "completed":
+                video_url = result_data["outputs"][0]
+                break
+
+            if task_status in {"failed", "cancelled", "timeout", "deleted"}:
+                raise RuntimeError(
+                    result_data.get("error") or f"WaveSpeed: {task_status}"
+                )
+
+        video_bytes = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(
+                video_url,
+                timeout=120
+            ).read()
+        )
+
+        await status.delete()
+
+        await message.answer_video(
+            BufferedInputFile(video_bytes, filename="promtman_video.mp4"),
+            caption="🎬 Готово!"
+        )
+
+    except Exception as e:
+        await status.edit_text(f"❌ Ошибка генерации видео:\n{e}")
 @dp.message()
 async def generate(message: Message):
     if not message.text:
