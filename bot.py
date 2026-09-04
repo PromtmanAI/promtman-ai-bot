@@ -110,7 +110,7 @@ async def select_kling_duration(callback: CallbackQuery):
 
     user_id = callback.from_user.id
 
-       if user_id not in user_references:
+    if user_id not in user_references:
         user_references[user_id] = {}
 
     user_references[user_id]["video_model"] = "kling"
