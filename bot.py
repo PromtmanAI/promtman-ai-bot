@@ -1497,18 +1497,18 @@ async def generate(message: Message):
         await status.delete()
 
 
-        except Exception as e:
-    print("IMAGE ERROR:", repr(e))
+            except Exception as e:
+        print("IMAGE ERROR:", repr(e))
 
-    if hasattr(e, "read"):
-        try:
-            print("API RESPONSE:", e.read().decode("utf-8"))
-        except Exception:
-            pass
+        if hasattr(e, "read"):
+            try:
+                print("API RESPONSE:", e.read().decode("utf-8"))
+            except Exception:
+                pass
 
-    await status.edit_text(
-        f"❌ Ошибка генерации:\n{e}"
-            )
+        await status.edit_text(
+            f"❌ Ошибка генерации:\n{e}"
+        )
 
 
     
