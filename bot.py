@@ -1364,7 +1364,7 @@ elif selected_model == "seedream_ws":
     token_cost = 2 if quality == "2K" else 1   
 use_paid = False
 
-    with psycopg.connect(DATABASE_URL) as conn:
+with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT balance FROM users WHERE user_id = %s",
