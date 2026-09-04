@@ -190,10 +190,11 @@ with psycopg.connect(DATABASE_URL) as conn:
 @dp.message(CommandStart())
 async def start(message: Message):
     await message.answer(
-        "👋 Привет! Я Promtman AI.\n\n"
-        "🎨 Напиши, какую картинку хочешь создать.\n\n"
-        "Например:\n"
-        "Белый Mercedes ночью в Дубае, cinematic photo",
+        "👋 Добро пожаловать в Promtman AI!\n\n"
+        "✨ Создавай изображения и видео с помощью лучших AI-моделей прямо в Telegram.\n\n"
+        "🎨 Изображения — создавай с нуля или используй свои фото\n"
+        "🎬 Видео — оживляй фотографии и создавай сцены по описанию\n\n"
+        "👇 Выбери, что хочешь создать:",
         reply_markup=reply_menu
     )
 
