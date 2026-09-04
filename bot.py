@@ -847,6 +847,7 @@ async def prompt_help(callback: CallbackQuery):
 @dp.message(lambda message: message.text == "👤 Профиль")
 async def profile_text(message: Message):
     user_id = message.from_user.id
+    name = message.from_user.first_name or "Пользователь"
 
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
@@ -858,9 +859,40 @@ async def profile_text(message: Message):
 
     balance = row[0] if row else 0
 
+    profile_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="💎 Пополнить баланс",
+                    callback_data="buy"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📊 Статистика",
+                    callback_data="profile_stats"
+                ),
+                InlineKeyboardButton(
+                    text="🎁 Пригласить друга",
+                    callback_data="invite_friend"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🆘 Поддержка",
+                    callback_data="support"
+                )
+            ]
+        ]
+    )
+
     await message.answer(
-        f"👤 Профиль\n\n"
-        f"💎 Генераций на балансе: {balance}"
+        f"👤 Профиль Promtman AI\n\n"
+        f"👋 {name}\n"
+        f"🆔 ID: {user_id}\n"
+        f"💎 Баланс: {balance} генераций\n\n"
+        f"✨ Создавай больше — впереди новые возможности!",
+        reply_markup=profile_menu
     )
 @dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
