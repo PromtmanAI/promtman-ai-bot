@@ -241,14 +241,40 @@ async def select_gpt(callback: CallbackQuery):
 async def select_seedream(callback: CallbackQuery):
     await callback.answer()
 
+    quality_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1K — 1 💠", callback_data="fal_1k"),
+                InlineKeyboardButton(text="2K — 2 💠", callback_data="fal_2k"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "🌱 Выбран Seedream 5.0 Pro.\n\n"
+        "Выбери качество:",
+        reply_markup=quality_menu
+    )
+@dp.callback_query(lambda c: c.data in ["fal_1k", "fal_2k"])
+async def select_seedream_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "fal_1k": "1K",
+        "fal_2k": "2K",
+    }
+
+    quality = quality_map[callback.data]
+
     user_references[callback.from_user.id] = {
         "model": "seedream",
-        "image": None
+        "image": None,
+        "quality": quality
     }
 
     await callback.message.answer(
-        "💥 Выбран Seedream 5.0 Pro.\n\n"
-        "🖼 Отправь фото-референс."
+        f"✅ Seedream 5.0 Pro — {quality}\n"
+        f"📷 Теперь отправь фото-референс."
     )
 @dp.callback_query(lambda c: c.data == "model_seedream_ws")
 async def select_seedream_ws(callback: CallbackQuery):
