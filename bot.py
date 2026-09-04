@@ -955,14 +955,16 @@ async def profile_button(callback: CallbackQuery):
 async def buy_text(message: Message):
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="5 генераций — 50 ⭐", callback_data="buy_5")],
-            [InlineKeyboardButton(text="10 генераций — 90 ⭐", callback_data="buy_10")],
-            [InlineKeyboardButton(text="25 генераций — 200 ⭐", callback_data="buy_25")]
+            [InlineKeyboardButton(text="🪙 50 токенов — 50 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="🪙 100 токенов — 100 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="🪙 300 токенов — 300 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="🪙 600 токенов — 600 ⭐", callback_data="buy_600")],
+            [InlineKeyboardButton(text="🪙 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
         ]
     )
 
     await message.answer(
-        "💎 Выбери пакет генераций:",
+        "🪙 Выбери пакет токенов:",
         reply_markup=buy_menu
     )
 @dp.callback_query(lambda c: c.data == "buy")
@@ -971,27 +973,29 @@ async def buy_button(callback: CallbackQuery):
 
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="5 генераций — 50 ⭐", callback_data="buy_5")],
-            [InlineKeyboardButton(text="10 генераций — 90 ⭐", callback_data="buy_10")],
-            [InlineKeyboardButton(text="25 генераций — 200 ⭐", callback_data="buy_25")]
+            [InlineKeyboardButton(text="🪙 50 токенов — 50 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="🪙 100 токенов — 100 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="🪙 300 токенов — 300 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="🪙 600 токенов — 600 ⭐", callback_data="buy_600")],
+            [InlineKeyboardButton(text="🪙 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
         ]
     )
 
     await callback.message.answer(
-        "💎 Выбери пакет генераций:",
+        "🪙 Выбери пакет токенов:",
         reply_markup=buy_menu
     )
-    @dp.callback_query(lambda c: c.data == "buy_5")
-    async def buy_5(callback: CallbackQuery):
-        await callback.answer()
+@dp.callback_query(lambda c: c.data == "buy_50")
+async def buy_50(callback: CallbackQuery):
+    await callback.answer()
 
     await callback.message.answer_invoice(
-        title="5 генераций",
-        description="Пакет из 5 генераций изображений",
-        payload="buy_5",
+        title="🪙 50 токенов",
+        description="Пополнение баланса Promtman AI на 50 токенов",
+        payload="buy_50",
         currency="XTR",
         prices=[
-            LabeledPrice(label="5 генераций", amount=50)
+            LabeledPrice(label="50 токенов", amount=50)
         ]
     )
 @dp.pre_checkout_query()
@@ -1001,18 +1005,73 @@ async def pre_checkout(pre_checkout_query):
 async def successful_payment(message: Message):
     user_id = message.from_user.id
 
-    if message.successful_payment.invoice_payload == "buy_5":
-        with psycopg.connect(DATABASE_URL) as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO users (user_id, balance)
-                    VALUES (%s, 5)
-                    ON CONFLICT (user_id)
-                    DO UPDATE SET balance = users.balance + 5
-                    """,
-                    (user_id,)
-                )
+    if message.successful_payment.invoice_payload == "buy_50":
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO users (user_id, balance)
+                VALUES (%s, 50)
+                ON CONFLICT (user_id)
+                DO UPDATE SET balance = users.balance + 50
+                """,
+                (user_id,)
+            )
+
+    await message.answer(
+        "✅ Оплата прошла!\n"
+        "🪙 На баланс начислено 50 токенов."
+    )
+@dp.callback_query(lambda c: c.data == "buy_100")
+async def buy_100(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer_invoice(
+        title="🪙 100 токенов",
+        description="Пополнение баланса Promtman AI на 100 токенов",
+        payload="buy_100",
+        currency="XTR",
+        prices=[LabeledPrice(label="100 токенов", amount=100)]
+    )
+
+
+@dp.callback_query(lambda c: c.data == "buy_300")
+async def buy_300(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer_invoice(
+        title="🪙 300 токенов",
+        description="Пополнение баланса Promtman AI на 300 токенов",
+        payload="buy_300",
+        currency="XTR",
+        prices=[LabeledPrice(label="300 токенов", amount=300)]
+    )
+
+
+@dp.callback_query(lambda c: c.data == "buy_600")
+async def buy_600(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer_invoice(
+        title="🪙 600 токенов",
+        description="Пополнение баланса Promtman AI на 600 токенов",
+        payload="buy_600",
+        currency="XTR",
+        prices=[LabeledPrice(label="600 токенов", amount=600)]
+    )
+
+
+@dp.callback_query(lambda c: c.data == "buy_1000")
+async def buy_1000(callback: CallbackQuery):
+    await callback.answer()
+
+    await callback.message.answer_invoice(
+        title="🪙 1000 токенов",
+        description="Пополнение баланса Promtman AI на 1000 токенов",
+        payload="buy_1000",
+        currency="XTR",
+        prices=[LabeledPrice(label="1000 токенов", amount=1000)]
+    )
 
         await message.answer(
             "✅ Оплата прошла!\n"
