@@ -1386,7 +1386,7 @@ with psycopg.connect(DATABASE_URL) as conn:
 
                 use_paid = True
 
-    status = await message.answer("⏳ Создаю изображение...")
+status = await message.answer("⏳ Создаю изображение...")
 
     try:
         reference_data = user_references.get(user_id)
