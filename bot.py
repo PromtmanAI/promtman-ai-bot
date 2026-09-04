@@ -1004,23 +1004,36 @@ async def pre_checkout(pre_checkout_query):
 @dp.message(lambda message: message.successful_payment is not None)
 async def successful_payment(message: Message):
     user_id = message.from_user.id
+    payload = message.successful_payment.invoice_payload
 
-    if message.successful_payment.invoice_payload == "buy_50":
+    packages = {
+        "buy_50": 50,
+        "buy_100": 100,
+        "buy_300": 300,
+        "buy_600": 600,
+        "buy_1000": 1000
+    }
+
+    tokens = packages.get(payload)
+
+    if tokens is None:
+        return
+
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO users (user_id, balance)
-                VALUES (%s, 50)
+                VALUES (%s, %s)
                 ON CONFLICT (user_id)
-                DO UPDATE SET balance = users.balance + 50
+                DO UPDATE SET balance = users.balance + %s
                 """,
-                (user_id,)
+                (user_id, tokens, tokens)
             )
 
     await message.answer(
-        "✅ Оплата прошла!\n"
-        "🪙 На баланс начислено 50 токенов."
+        f"✅ Оплата прошла!\n"
+        f"🪙 На баланс начислено {tokens} токенов."
     )
 @dp.callback_query(lambda c: c.data == "buy_100")
 async def buy_100(callback: CallbackQuery):
