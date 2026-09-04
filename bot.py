@@ -1495,9 +1495,9 @@ async def generate(message: Message):
             )
         
         await status.delete()
-
-
-        except Exception as e:
+    
+    
+    except Exception as e:
         print("IMAGE ERROR:", repr(e))
 
         if hasattr(e, "read"):
