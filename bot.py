@@ -610,7 +610,7 @@ async def select_seedance_ratio(callback: CallbackQuery):
     ]
 )
 
-await callback.message.answer(
+    await callback.message.answer(
     "🎞 Теперь выбери качество видео:",
     reply_markup=quality_menu
 )
