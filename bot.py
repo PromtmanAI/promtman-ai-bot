@@ -186,6 +186,15 @@ with psycopg.connect(DATABASE_URL) as conn:
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS balance INTEGER NOT NULL DEFAULT 0
         """)
+                cur.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS images_created INTEGER NOT NULL DEFAULT 0
+        """)
+
+        cur.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS videos_created INTEGER NOT NULL DEFAULT 0
+        """)
 
 @dp.message(CommandStart())
 async def start(message: Message):
