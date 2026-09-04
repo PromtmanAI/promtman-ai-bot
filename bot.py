@@ -399,13 +399,13 @@ async def finish_media_group(message: Message, user_id: int, media_group_id: str
         pass
     finally:
         media_group_tasks.pop(media_group_id, None)
- @dp.message(
+@dp.message(
     lambda message:
         message.photo
         and message.from_user.id in user_references
         and user_references[message.from_user.id].get("video_model") == "kling"
         and user_references[message.from_user.id].get("video_image") is None
- )
+)
 async def receive_kling_photo(message: Message):
     user_id = message.from_user.id
 
