@@ -903,6 +903,34 @@ async def profile_text(message: Message):
         f"✨ Создавай больше — впереди новые возможности!",
         reply_markup=profile_menu
     )
+@dp.callback_query(lambda c: c.data == "profile_stats")
+async def profile_stats(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT images_created, videos_created
+                FROM users
+                WHERE user_id = %s
+                """,
+                (user_id,)
+            )
+            row = cur.fetchone()
+
+    images_created = row[0] if row else 0
+    videos_created = row[1] if row else 0
+    total = images_created + videos_created
+
+    await callback.message.answer(
+        f"📊 Статистика Promtman AI\n\n"
+        f"🎨 Создано изображений: {images_created}\n"
+        f"🎬 Создано видео: {videos_created}\n"
+        f"✨ Всего генераций: {total}"
+    )
 @dp.callback_query(lambda c: c.data == "profile")
 async def profile_button(callback: CallbackQuery):
     await callback.answer()
