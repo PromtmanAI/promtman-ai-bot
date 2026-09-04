@@ -98,6 +98,20 @@ async def select_video_kling(callback: CallbackQuery):
         "⏱ Выбери длительность видео:",
         reply_markup=duration_menu
     )
+@dp.callback_query(lambda c: c.data == "video_seedance")
+async def select_video_seedance(callback: CallbackQuery):
+    await callback.answer()
+
+    user_references[callback.from_user.id] = {
+        "video_model": "seedance",
+        "video_images": []
+    }
+
+    await callback.message.answer(
+        "🔥 Выбран Seedance 2.5.\n\n"
+        "🖼 Отправь фото-референсы.\n"
+        "Можно добавить до 30 фото."
+    )
     
 @dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
 async def select_kling_duration(callback: CallbackQuery):
