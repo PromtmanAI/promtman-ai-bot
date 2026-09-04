@@ -1449,6 +1449,7 @@ async def generate(message: Message):
 ),
                     "image_urls": reference_data_uris,
                     "num_images": 1,
+                    "image_size": "auto_2K" if reference_data.get("quality") == "2K" else "auto_1K",
                     "output_format": "jpeg"
                 }
             )
