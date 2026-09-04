@@ -699,11 +699,12 @@ async def generate_kling_video(message: Message):
         }
 
         payload = {
-            "prompt": message.text,
-            "image": image_data_uri,
-            "duration": data.get("video_duration", 5),
-            "guidance_scale": 0.5
-        }
+    "prompt": message.text,
+    "image": image_data_uri,
+    "duration": data.get("video_duration", 5),
+    "aspect_ratio": data.get("video_ratio", "16:9"),
+    "guidance_scale": 0.5
+}
 
         request = urllib.request.Request(
             "https://api.wavespeed.ai/api/v3/kwaivgi/kling-v2.5-turbo-pro/image-to-video",
