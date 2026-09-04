@@ -43,15 +43,83 @@ reply_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="🎨 Создать изображение"),
-            KeyboardButton(text="💎 Купить генерации"),
+            KeyboardButton(text="🎬 Создать видео"),
         ],
         [
+            KeyboardButton(text="💎 Купить генерации"),
             KeyboardButton(text="👤 Профиль"),
         ]
     ],
     resize_keyboard=True
 )
+@dp.message(lambda message: message.text == "🎬 Создать видео")
+async def video_start(message: Message):
+    video_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⚡ Kling 2.5 Turbo Pro",
+                    callback_data="video_kling"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔥 Seedance 2.5",
+                    callback_data="video_seedance"
+                )
+            ]
+        ]
+    )
+
+    await message.answer(
+        "🎬 Выбери модель для видео:",
+        reply_markup=video_menu
+    )
+    @dp.callback_query(lambda c: c.data == "video_kling")
+async def select_video_kling(callback: CallbackQuery):
+    await callback.answer()
+
+    user_references[callback.from_user.id] = {
+        "video_model": "kling",
+        "video_image": None
+    }
+
+    duration_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="5 сек", callback_data="kling_5"),
+                InlineKeyboardButton(text="10 сек", callback_data="kling_10"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "⚡ Выбран Kling 2.5 Turbo Pro.\n\n"
+        "⏱ Выбери длительность видео:",
+        reply_markup=duration_menu
+    )
     
+    @dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
+async def select_kling_duration(callback: CallbackQuery):
+    await callback.answer()
+
+    duration_map = {
+        "kling_5": 5,
+        "kling_10": 10,
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        user_references[user_id] = {}
+
+    user_references[user_id]["video_model"] = "kling"
+    user_references[user_id]["video_duration"] = duration_map[callback.data]
+    user_references[user_id]["video_image"] = None
+
+    await callback.message.answer(
+        "🖼 Теперь отправь одно фото, которое нужно оживить."
+    )
     
 with psycopg.connect(DATABASE_URL) as conn:
     with conn.cursor() as cur:
