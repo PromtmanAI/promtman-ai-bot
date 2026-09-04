@@ -110,7 +110,7 @@ async def select_video_seedance(callback: CallbackQuery):
     await callback.message.answer(
         "🔥 Выбран Seedance 2.5.\n\n"
         "🖼 Отправь фото-референсы.\n"
-        "Можно добавить до 30 фото."
+        "Можно добавить до 10 фото."
     )
     
 @dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
@@ -478,9 +478,8 @@ async def receive_seedance_photo(message: Message):
     user_id = message.from_user.id
     data = user_references[user_id]
 
-    if len(data["video_images"]) >= 30:
-        await message.answer("⚠️ Можно добавить максимум 30 фото.")
-        return
+    if len(data["video_images"]) >= 10:
+    await message.answer("⚠️ Можно добавить максимум 10 фото.")
 
     photo = await bot.download(message.photo[-1])
     data["video_images"].append(photo.read())
@@ -497,7 +496,7 @@ async def receive_seedance_photo(message: Message):
     )
 
     await message.answer(
-        f"✅ Добавлено фото: {len(data['video_images'])}/30\n\n"
+        f"✅ Добавлено фото: {len(data['video_images'])}/10\n\n"
         "Можешь отправить ещё или нажать «Готово».",
         reply_markup=done_menu
     )
@@ -596,10 +595,160 @@ async def select_seedance_ratio(callback: CallbackQuery):
 
     user_references[user_id]["video_ratio"] = ratio_map[callback.data]
 
+    quality_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="720p",
+                callback_data="seedance_720p"
+            ),
+            InlineKeyboardButton(
+                text="1080p",
+                callback_data="seedance_1080p"
+            ),
+        ]
+    ]
+)
+
+await callback.message.answer(
+    "🎞 Теперь выбери качество видео:",
+    reply_markup=quality_menu
+)
+@dp.callback_query(
+    lambda c: c.data in [
+        "seedance_720p",
+        "seedance_1080p",
+    ]
+)
+async def select_seedance_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "seedance_720p": "720p",
+        "seedance_1080p": "1080p",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери Seedance 2.5.")
+        return
+
+    user_references[user_id]["video_resolution"] = quality_map[callback.data]
+
+    sound_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🔊 Со звуком",
+                    callback_data="seedance_sound_on"
+                ),
+                InlineKeyboardButton(
+                    text="🔇 Без звука",
+                    callback_data="seedance_sound_off"
+                ),
+            ]
+        ]
+    )
+
     await callback.message.answer(
-        "✅ Формат выбран.\n\n"
+        "🔊 Добавить звук в видео?",
+        reply_markup=sound_menu
+    )
+@dp.callback_query(
+    lambda c: c.data in [
+        "seedance_sound_on",
+        "seedance_sound_off",
+    ]
+)
+async def select_seedance_sound(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери Seedance 2.5.")
+        return
+
+    user_references[user_id]["video_audio"] = (
+        callback.data == "seedance_sound_on"
+    )
+
+    await callback.message.answer(
+    "✍️ Теперь опиши, что должно происходить в видео.\n\n"
+    "💡 Если загружено несколько фото, используй @image1, @image2, @image3 и т.д.\n\n"
+    "Например:\n"
+    "@image1 подходит к @image2, они обнимаются и смотрят друг на друга. "
+    "Камера плавно приближается."
+)
+@dp.callback_query(
+    lambda c: c.data in [
+        "seedance_sound_on",
+        "seedance_sound_off",
+    ]
+)
+async def select_seedance_sound(callback: CallbackQuery):
+    await callback.answer()
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери Seedance 2.5.")
+        return
+
+    user_references[user_id]["video_audio"] = (
+        callback.data == "seedance_sound_on"
+    )
+
+    await callback.message.answer(
         "✍️ Теперь напиши, что должно происходить в видео."
     )
+    async def upload_image_to_wavespeed(image_bytes):
+    headers = {
+        "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    ticket_payload = {
+        "filename": "reference.jpg",
+        "size": len(image_bytes)
+    }
+
+    ticket_request = urllib.request.Request(
+        "https://api.wavespeed.ai/api/v3/media/uploads",
+        data=json.dumps(ticket_payload).encode("utf-8"),
+        headers=headers,
+        method="POST"
+    )
+
+    ticket_response = await asyncio.to_thread(
+        lambda: urllib.request.urlopen(
+            ticket_request,
+            timeout=30
+        ).read()
+    )
+
+    ticket_data = json.loads(ticket_response)["data"]
+
+    upload_url = ticket_data["upload"]["url"]
+    upload_headers = ticket_data["upload"]["headers"]
+    download_url = ticket_data["download_url"]
+
+    upload_request = urllib.request.Request(
+        upload_url,
+        data=image_bytes,
+        headers=upload_headers,
+        method="PUT"
+    )
+
+    await asyncio.to_thread(
+        lambda: urllib.request.urlopen(
+            upload_request,
+            timeout=60
+        ).read()
+    )
+
+    return download_url
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
     user_id = message.from_user.id
@@ -909,6 +1058,102 @@ async def generate_kling_video(message: Message):
 
     except Exception as e:
         await status.edit_text(f"❌ Ошибка генерации видео:\n{e}")
+        @dp.message(
+    lambda message:
+        message.text
+        and message.from_user.id in user_references
+        and user_references[message.from_user.id].get("video_model") == "seedance"
+        and user_references[message.from_user.id].get("video_images")
+)
+async def generate_seedance_video(message: Message):
+    user_id = message.from_user.id
+    data = user_references[user_id]
+
+    status = await message.answer("🎬 Загружаю референсы и создаю видео...")
+
+    try:
+        reference_urls = []
+
+        for image_bytes in data["video_images"]:
+            image_url = await upload_image_to_wavespeed(image_bytes)
+            reference_urls.append(image_url)
+
+        headers = {
+            "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "prompt": message.text,
+            "reference_images": reference_urls,
+            "aspect_ratio": data.get("video_ratio", "16:9"),
+            "resolution": data.get("video_resolution", "720p"),
+            "duration": data.get("video_duration", 5),
+            "generate_audio": data.get("video_audio", True)
+        }
+
+        request = urllib.request.Request(
+            "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.5/text-to-video",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+
+        response = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(request, timeout=60).read()
+        )
+
+        task_data = json.loads(response)
+        task_id = task_data["data"]["id"]
+
+        while True:
+            await asyncio.sleep(3)
+
+            result_request = urllib.request.Request(
+                f"https://api.wavespeed.ai/api/v3/predictions/{task_id}/result",
+                headers={"Authorization": f"Bearer {WAVESPEED_API_KEY}"}
+            )
+
+            result_response = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(
+                    result_request,
+                    timeout=30
+                ).read()
+            )
+
+            result_data = json.loads(result_response)["data"]
+            task_status = result_data["status"]
+
+            if task_status == "completed":
+                video_url = result_data["outputs"][0]
+                break
+
+            if task_status in {"failed", "cancelled", "timeout", "deleted"}:
+                raise RuntimeError(
+                    result_data.get("error") or f"WaveSpeed: {task_status}"
+                )
+
+        video_bytes = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(
+                video_url,
+                timeout=120
+            ).read()
+        )
+
+        await status.delete()
+
+        await message.answer_video(
+            BufferedInputFile(
+                video_bytes,
+                filename="promtman_seedance.mp4"
+            ),
+            caption="🎬 Seedance 2.5 — готово!"
+        )
+
+    except Exception as e:
+        await status.edit_text(
+            f"❌ Ошибка Seedance 2.5:\n{e}"
+        )
 @dp.message()
 async def generate(message: Message):
     if not message.text:
