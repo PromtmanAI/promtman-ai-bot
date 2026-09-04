@@ -1086,10 +1086,7 @@ async def buy_1000(callback: CallbackQuery):
         prices=[LabeledPrice(label="1000 токенов", amount=1000)]
     )
 
-        await message.answer(
-            "✅ Оплата прошла!\n"
-            "💎 На баланс начислено 5 генераций."
-        )
+       
 @dp.message(Command("testcredits"))
 async def test_credits(message: Message):
     user_id = message.from_user.id
