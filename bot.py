@@ -110,12 +110,50 @@ async def select_kling_duration(callback: CallbackQuery):
 
     user_id = callback.from_user.id
 
-    if user_id not in user_references:
+       if user_id not in user_references:
         user_references[user_id] = {}
 
     user_references[user_id]["video_model"] = "kling"
     user_references[user_id]["video_duration"] = duration_map[callback.data]
     user_references[user_id]["video_image"] = None
+
+    format_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="📱 9:16", callback_data="kling_ratio_9_16"),
+            InlineKeyboardButton(text="🖥 16:9", callback_data="kling_ratio_16_9"),
+            InlineKeyboardButton(text="⬜ 1:1", callback_data="kling_ratio_1_1"),
+        ]
+    ]
+)
+
+await callback.message.answer(
+    "📐 Теперь выбери формат видео:",
+    reply_markup=format_menu
+)
+@dp.callback_query(
+    lambda c: c.data in [
+        "kling_ratio_9_16",
+        "kling_ratio_16_9",
+        "kling_ratio_1_1",
+    ]
+)
+async def select_kling_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "kling_ratio_9_16": "9:16",
+        "kling_ratio_16_9": "16:9",
+        "kling_ratio_1_1": "1:1",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери длительность.")
+        return
+
+    user_references[user_id]["video_ratio"] = ratio_map[callback.data]
 
     await callback.message.answer(
         "🖼 Теперь отправь одно фото, которое нужно оживить."
