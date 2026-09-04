@@ -175,7 +175,7 @@ async def select_seedream_ws_quality(callback: CallbackQuery):
         "📐 Теперь выбери формат изображения:",
         reply_markup=format_menu
     )
-    @dp.callback_query(
+@dp.callback_query(
     lambda c: c.data in [
         "ws_ratio_1_1",
         "ws_ratio_3_4",
