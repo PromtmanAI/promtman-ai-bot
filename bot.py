@@ -1058,7 +1058,7 @@ async def generate_kling_video(message: Message):
 
     except Exception as e:
         await status.edit_text(f"❌ Ошибка генерации видео:\n{e}")
-        @dp.message(
+@dp.message(
     lambda message:
         message.text
         and message.from_user.id in user_references
