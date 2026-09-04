@@ -127,7 +127,7 @@ async def select_kling_duration(callback: CallbackQuery):
     ]
 )
 
-await callback.message.answer(
+    await callback.message.answer(
     "📐 Теперь выбери формат видео:",
     reply_markup=format_menu
 )
