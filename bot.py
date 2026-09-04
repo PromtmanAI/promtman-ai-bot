@@ -186,7 +186,7 @@ with psycopg.connect(DATABASE_URL) as conn:
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS balance INTEGER NOT NULL DEFAULT 0
         """)
-                cur.execute("""
+        cur.execute("""
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS images_created INTEGER NOT NULL DEFAULT 0
         """)
