@@ -955,16 +955,16 @@ async def profile_button(callback: CallbackQuery):
 async def buy_text(message: Message):
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🪙 50 токенов — 50 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="🪙 100 токенов — 100 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="🪙 300 токенов — 300 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="🪙 600 токенов — 600 ⭐", callback_data="buy_600")],
-            [InlineKeyboardButton(text="🪙 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
+            [InlineKeyboardButton(text="💠 50 токенов — 50 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 100 токенов — 100 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 300 токенов — 300 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 600 токенов — 600 ⭐", callback_data="buy_600")],
+            [InlineKeyboardButton(text="💠 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
         ]
     )
 
     await message.answer(
-        "🪙 Выбери пакет токенов:",
+        "💠 Выбери пакет токенов:",
         reply_markup=buy_menu
     )
 @dp.callback_query(lambda c: c.data == "buy")
@@ -973,16 +973,16 @@ async def buy_button(callback: CallbackQuery):
 
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🪙 50 токенов — 50 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="🪙 100 токенов — 100 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="🪙 300 токенов — 300 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="🪙 600 токенов — 600 ⭐", callback_data="buy_600")],
-            [InlineKeyboardButton(text="🪙 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
+            [InlineKeyboardButton(text="💠 50 токенов — 50 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 100 токенов — 100 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 300 токенов — 300 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 600 токенов — 600 ⭐", callback_data="buy_600")],
+            [InlineKeyboardButton(text="💠 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
         ]
     )
 
     await callback.message.answer(
-        "🪙 Выбери пакет токенов:",
+        "💠 Выбери пакет токенов:",
         reply_markup=buy_menu
     )
 @dp.callback_query(lambda c: c.data == "buy_50")
@@ -990,7 +990,7 @@ async def buy_50(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="🪙 50 токенов",
+        title="💠 50 токенов",
         description="Пополнение баланса Promtman AI на 50 токенов",
         payload="buy_50",
         currency="XTR",
@@ -1033,14 +1033,14 @@ async def successful_payment(message: Message):
 
     await message.answer(
         f"✅ Оплата прошла!\n"
-        f"🪙 На баланс начислено {tokens} токенов."
+        f"💠 На баланс начислено {tokens} токенов."
     )
 @dp.callback_query(lambda c: c.data == "buy_100")
 async def buy_100(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="🪙 100 токенов",
+        title="💠 100 токенов",
         description="Пополнение баланса Promtman AI на 100 токенов",
         payload="buy_100",
         currency="XTR",
@@ -1053,7 +1053,7 @@ async def buy_300(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="🪙 300 токенов",
+        title="💠 300 токенов",
         description="Пополнение баланса Promtman AI на 300 токенов",
         payload="buy_300",
         currency="XTR",
@@ -1066,7 +1066,7 @@ async def buy_600(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="🪙 600 токенов",
+        title="💠 600 токенов",
         description="Пополнение баланса Promtman AI на 600 токенов",
         payload="buy_600",
         currency="XTR",
@@ -1079,7 +1079,7 @@ async def buy_1000(callback: CallbackQuery):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="🪙 1000 токенов",
+        title="💠 1000 токенов",
         description="Пополнение баланса Promtman AI на 1000 токенов",
         payload="buy_1000",
         currency="XTR",
