@@ -1350,7 +1350,7 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-    reference_data = user_references.get(user_id)
+      reference_data = user_references.get(user_id)
     selected_model = reference_data.get("model") if reference_data else None
     quality = reference_data.get("quality", "1K") if reference_data else "1K"
 
@@ -1361,7 +1361,8 @@ async def generate(message: Message):
     elif selected_model == "seedream":
         token_cost = 2 if quality == "2K" else 1
     elif selected_model == "seedream_ws":
-        token_cost = 2 if quality == "2K" else 1   
+        token_cost = 2 if quality == "2K" else 1
+
     use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -1377,20 +1378,22 @@ async def generate(message: Message):
 
                 if balance < token_cost:
                     await message.answer(
-    f"❌ Недостаточно токенов.\n\n"
-    f"💠 Нужно: {token_cost}\n"
-    f"💠 На балансе: {balance}\n\n"
-    f"Пополните баланс, чтобы продолжить."
-                )
+                        f"❌ Недостаточно токенов.\n\n"
+                        f"💠 Нужно: {token_cost}\n"
+                        f"💠 На балансе: {balance}\n\n"
+                        f"Пополните баланс, чтобы продолжить."
+                    )
                     return
 
                 use_paid = True
+
     status = await message.answer("⏳ Создаю изображение...")
 
-try:
+    try:
         reference_data = user_references.get(user_id)
         reference_images = reference_data.get("images", []) if reference_data else []
         selected_model = reference_data.get("model") if reference_data else None
+
         if reference_data:
             reference_data["last_prompt"] = prompt_text
 
@@ -1399,7 +1402,6 @@ try:
                 "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
             )
             return
-
         if selected_model == "nano_pro":
             interaction = await asyncio.to_thread(
                 gemini_client.interactions.create,
