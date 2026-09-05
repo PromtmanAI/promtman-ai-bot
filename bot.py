@@ -266,7 +266,7 @@ async def select_seedream_quality(callback: CallbackQuery):
 
     quality = quality_map[callback.data]
 
-        user_references[callback.from_user.id] = {
+    user_references[callback.from_user.id] = {
         "model": "seedream",
         "images": [],
         "quality": quality
