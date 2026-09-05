@@ -1385,8 +1385,7 @@ async def generate(message: Message):
                     return
 
                 use_paid = True
-
-status = await message.answer("⏳ Создаю изображение...")
+    status = await message.answer("⏳ Создаю изображение...")
 
 try:
         reference_data = user_references.get(user_id)
