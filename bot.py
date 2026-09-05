@@ -1022,7 +1022,7 @@ async def profile_button(callback: CallbackQuery):
 
     await callback.message.answer(
         f"👤 Профиль\n\n"
-        f"💎 Генераций на балансе: {balance}"
+        f"💠 Баланс: {balance} токенов"
     )
 @dp.message(lambda message: message.text == "💎 Купить генерации")
 async def buy_text(message: Message):
