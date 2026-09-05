@@ -1376,7 +1376,7 @@ with psycopg.connect(DATABASE_URL) as conn:
                 balance = row[0]
 
                 if balance < token_cost:
-                    await message.answer(
+await message.answer(
     f"❌ Недостаточно токенов.\n\n"
     f"💠 Нужно: {token_cost}\n"
     f"💠 На балансе: {balance}\n\n"
