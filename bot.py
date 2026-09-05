@@ -257,6 +257,75 @@ async def select_gpt2(callback: CallbackQuery):
         "Выбери качество:",
         reply_markup=quality_menu
     )
+@dp.callback_query(lambda c: c.data in ["gpt2_1k", "gpt2_2k", "gpt2_4k"])
+async def select_gpt2_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "gpt2_1k": "1K",
+        "gpt2_2k": "2K",
+        "gpt2_4k": "4K",
+    }
+
+    quality = quality_map[callback.data]
+
+    user_references[callback.from_user.id] = {
+        "model": "gpt2",
+        "images": [],
+        "quality": quality
+    }
+
+    format_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1:1", callback_data="gpt2_ratio_1_1"),
+                InlineKeyboardButton(text="9:16", callback_data="gpt2_ratio_9_16"),
+                InlineKeyboardButton(text="16:9", callback_data="gpt2_ratio_16_9"),
+            ],
+            [
+                InlineKeyboardButton(text="3:4", callback_data="gpt2_ratio_3_4"),
+                InlineKeyboardButton(text="4:3", callback_data="gpt2_ratio_4_3"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        f"✨ GPT Image 2 — {quality}\n\n"
+        "📐 Теперь выбери формат изображения:",
+        reply_markup=format_menu
+    )
+@dp.callback_query(
+    lambda c: c.data in [
+        "gpt2_ratio_1_1",
+        "gpt2_ratio_9_16",
+        "gpt2_ratio_16_9",
+        "gpt2_ratio_3_4",
+        "gpt2_ratio_4_3",
+    ]
+)
+async def select_gpt2_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "gpt2_ratio_1_1": "1:1",
+        "gpt2_ratio_9_16": "9:16",
+        "gpt2_ratio_16_9": "16:9",
+        "gpt2_ratio_3_4": "3:4",
+        "gpt2_ratio_4_3": "4:3",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери качество.")
+        return
+
+    user_references[user_id]["ratio"] = ratio_map[callback.data]
+
+    await callback.message.answer(
+        f"✅ Формат: {ratio_map[callback.data]}\n\n"
+        "📷 Теперь отправь фото-референс."
+    )
 @dp.callback_query(lambda c: c.data == "model_seedream")
 async def select_seedream(callback: CallbackQuery):
     await callback.answer()
