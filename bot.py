@@ -267,14 +267,61 @@ async def select_seedream_quality(callback: CallbackQuery):
     quality = quality_map[callback.data]
 
     user_references[callback.from_user.id] = {
-        "model": "seedream",
-        "image": None,
-        "quality": quality
+    "model": "seedream",
+    "images": [],
+    "quality": quality
+}
+
+format_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="1:1", callback_data="fal_ratio_1_1"),
+            InlineKeyboardButton(text="3:4", callback_data="fal_ratio_3_4"),
+            InlineKeyboardButton(text="4:3", callback_data="fal_ratio_4_3"),
+        ],
+        [
+            InlineKeyboardButton(text="9:16", callback_data="fal_ratio_9_16"),
+            InlineKeyboardButton(text="16:9", callback_data="fal_ratio_16_9"),
+        ]
+    ]
+)
+
+await callback.message.answer(
+    f"✅ Seedream 5.0 Pro — {quality}\n\n"
+    "📐 Теперь выбери формат изображения:",
+    reply_markup=format_menu
+)
+@dp.callback_query(
+    lambda c: c.data in [
+        "fal_ratio_1_1",
+        "fal_ratio_3_4",
+        "fal_ratio_4_3",
+        "fal_ratio_9_16",
+        "fal_ratio_16_9",
+    ]
+)
+async def select_seedream_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "fal_ratio_1_1": "1:1",
+        "fal_ratio_3_4": "3:4",
+        "fal_ratio_4_3": "4:3",
+        "fal_ratio_9_16": "9:16",
+        "fal_ratio_16_9": "16:9",
     }
 
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери качество.")
+        return
+
+    user_references[user_id]["ratio"] = ratio_map[callback.data]
+
     await callback.message.answer(
-        f"✅ Seedream 5.0 Pro — {quality}\n"
-        f"📷 Теперь отправь фото-референс."
+        f"✅ Формат: {ratio_map[callback.data]}\n\n"
+        "📷 Теперь отправь фото-референс."
     )
 @dp.callback_query(lambda c: c.data == "model_seedream_ws")
 async def select_seedream_ws(callback: CallbackQuery):
