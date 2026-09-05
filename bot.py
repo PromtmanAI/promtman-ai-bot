@@ -1395,7 +1395,7 @@ try:
             reference_data["last_prompt"] = prompt_text
 
         if not reference_images:
-        await status.edit_text(
+            await status.edit_text(
                 "🖼 Сначала нажми «🎨 Создать изображение» и отправь фото-референс."
             )
             return
