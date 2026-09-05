@@ -219,6 +219,7 @@ async def generate_reference_start(message: Message):
     model_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
+            [InlineKeyboardButton(text="✨ GPT Image 2", callback_data="model_gpt2")],
             [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
             [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")], 
             [InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем", callback_data="model_seedream_ws")]
@@ -236,6 +237,25 @@ async def select_gpt(callback: CallbackQuery):
 
     await callback.message.answer(
         "🖼 Отправь фото-референс для GPT Image."
+    )
+@dp.callback_query(lambda c: c.data == "model_gpt2")
+async def select_gpt2(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1K", callback_data="gpt2_1k"),
+                InlineKeyboardButton(text="2K", callback_data="gpt2_2k"),
+                InlineKeyboardButton(text="4K", callback_data="gpt2_4k"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "✨ Выбран GPT Image 2.\n\n"
+        "Выбери качество:",
+        reply_markup=quality_menu
     )
 @dp.callback_query(lambda c: c.data == "model_seedream")
 async def select_seedream(callback: CallbackQuery):
