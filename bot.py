@@ -1350,21 +1350,21 @@ async def generate(message: Message):
         await message.answer(
             "✨ Улучшенный промт:\n\n" + prompt_text
         )
-reference_data = user_references.get(user_id)
-selected_model = reference_data.get("model") if reference_data else None
-quality = reference_data.get("quality", "1K") if reference_data else "1K"
+    reference_data = user_references.get(user_id)
+    selected_model = reference_data.get("model") if reference_data else None
+    quality = reference_data.get("quality", "1K") if reference_data else "1K"
 
-token_cost = 1
+    token_cost = 1
 
-if selected_model == "nano_pro":
-    token_cost = 4 if quality == "4K" else 2
-elif selected_model == "seedream":
-    token_cost = 2 if quality == "2K" else 1
-elif selected_model == "seedream_ws":
-    token_cost = 2 if quality == "2K" else 1   
-use_paid = False
+    if selected_model == "nano_pro":
+        token_cost = 4 if quality == "4K" else 2
+    elif selected_model == "seedream":
+        token_cost = 2 if quality == "2K" else 1
+    elif selected_model == "seedream_ws":
+        token_cost = 2 if quality == "2K" else 1   
+    use_paid = False
 
-with psycopg.connect(DATABASE_URL) as conn:
+    with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT balance FROM users WHERE user_id = %s",
@@ -1376,7 +1376,7 @@ with psycopg.connect(DATABASE_URL) as conn:
                 balance = row[0]
 
                 if balance < token_cost:
-await message.answer(
+                    await message.answer(
     f"❌ Недостаточно токенов.\n\n"
     f"💠 Нужно: {token_cost}\n"
     f"💠 На балансе: {balance}\n\n"
@@ -1615,7 +1615,7 @@ try:
     
         
         await status.delete()
-except Exception as e:
+    except Exception as e:
         print("IMAGE ERROR:", repr(e))
 
         if hasattr(e, "read"):
