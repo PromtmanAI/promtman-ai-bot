@@ -1575,6 +1575,71 @@ async def generate(message: Message):
             )
 
             image_bytes = base64.b64decode(interaction.output_image.data)
+        elif selected_model == "gpt2":
+            reference_data_uris = [
+                "data:image/jpeg;base64,"
+                + base64.b64encode(img).decode("utf-8")
+                for img in reference_images
+            ]
+
+            payload = {
+                "prompt": (
+                    "Используй человека с референсного фото как основу. "
+                    "Сохрани его узнаваемость и основные черты внешности. "
+                    "Но выполни изменения, которые пользователь явно попросил. "
+                    "Запрос пользователя: " + prompt_text
+                ),
+                "images": reference_data_uris,
+                "resolution": reference_data.get("quality", "1K").lower(),
+                "aspect_ratio": reference_data.get("ratio", "1:1"),
+                "quality": "medium",
+                "output_format": "jpeg"
+            }
+
+            req = urllib.request.Request(
+                "https://api.wavespeed.ai/api/v3/openai/gpt-image-2/edit",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                method="POST"
+            )
+
+            response = await asyncio.to_thread(urllib.request.urlopen, req)
+            result = json.loads(response.read().decode("utf-8"))
+
+            prediction_id = result["data"]["id"]
+
+            while True:
+                status_req = urllib.request.Request(
+                    f"https://api.wavespeed.ai/api/v3/predictions/{prediction_id}/result",
+                    headers={
+                        "Authorization": f"Bearer {WAVESPEED_API_KEY}"
+                    }
+                )
+
+                status_response = await asyncio.to_thread(
+                    urllib.request.urlopen,
+                    status_req
+                )
+                status_result = json.loads(
+                    status_response.read().decode("utf-8")
+                )
+
+                if status_result["data"]["status"] == "completed":
+                    image_url = status_result["data"]["outputs"][0]
+                    image_bytes = await asyncio.to_thread(
+                        urllib.request.urlopen,
+                        image_url
+                    )
+                    image_bytes = image_bytes.read()
+                    break
+
+                if status_result["data"]["status"] == "failed":
+                    raise Exception("GPT Image 2 generation failed")
+
+                await asyncio.sleep(2)
 
         elif selected_model == "seedream":
             reference_data_uris = [
