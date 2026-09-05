@@ -1494,6 +1494,8 @@ async def generate(message: Message):
 
     if selected_model == "nano_pro":
         token_cost = 4 if quality == "4K" else 2
+    elif selected_model == "gpt2":
+        token_cost = 4 if quality == "4K" else 2
     elif selected_model == "seedream":
         token_cost = 2 if quality == "2K" else 1
     elif selected_model == "seedream_ws":
