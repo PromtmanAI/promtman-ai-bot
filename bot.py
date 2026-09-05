@@ -972,7 +972,7 @@ async def profile_text(message: Message):
         f"👤 Профиль Promtman AI\n\n"
         f"👋 {name}\n"
         f"🆔 ID: {user_id}\n"
-        f"💠 Баланс: {balance} генераций\n\n"
+        f"💠 Баланс: {balance} токенов\n\n"
         f"✨ Создавай больше — впереди новые возможности!",
         reply_markup=profile_menu
     )
