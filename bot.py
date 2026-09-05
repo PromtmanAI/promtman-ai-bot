@@ -266,31 +266,31 @@ async def select_seedream_quality(callback: CallbackQuery):
 
     quality = quality_map[callback.data]
 
-    user_references[callback.from_user.id] = {
-    "model": "seedream",
-    "images": [],
-    "quality": quality
-}
+        user_references[callback.from_user.id] = {
+        "model": "seedream",
+        "images": [],
+        "quality": quality
+    }
 
-format_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="1:1", callback_data="fal_ratio_1_1"),
-            InlineKeyboardButton(text="3:4", callback_data="fal_ratio_3_4"),
-            InlineKeyboardButton(text="4:3", callback_data="fal_ratio_4_3"),
-        ],
-        [
-            InlineKeyboardButton(text="9:16", callback_data="fal_ratio_9_16"),
-            InlineKeyboardButton(text="16:9", callback_data="fal_ratio_16_9"),
+    format_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1:1", callback_data="fal_ratio_1_1"),
+                InlineKeyboardButton(text="3:4", callback_data="fal_ratio_3_4"),
+                InlineKeyboardButton(text="4:3", callback_data="fal_ratio_4_3"),
+            ],
+            [
+                InlineKeyboardButton(text="9:16", callback_data="fal_ratio_9_16"),
+                InlineKeyboardButton(text="16:9", callback_data="fal_ratio_16_9"),
+            ]
         ]
-    ]
-)
+    )
 
-await callback.message.answer(
-    f"✅ Seedream 5.0 Pro — {quality}\n\n"
-    "📐 Теперь выбери формат изображения:",
-    reply_markup=format_menu
-)
+    await callback.message.answer(
+        f"✅ Seedream 5.0 Pro — {quality}\n\n"
+        "📐 Теперь выбери формат изображения:",
+        reply_markup=format_menu
+    )
 @dp.callback_query(
     lambda c: c.data in [
         "fal_ratio_1_1",
