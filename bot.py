@@ -1740,10 +1740,10 @@ async def generate(message: Message):
         + base64.b64encode(reference_images[0]).decode("utf-8")
     )
 
-    payload = {
-        "model": "gpt-image-2/image-to-image",
-        "input": {
-            "prompt": (
+            payload = {
+                "model": "gpt-image-2/image-to-image",
+            "input": {
+                "prompt": (
                 "Используй человека с референсного фото как основу. "
                 "Сохрани его узнаваемость и основные черты внешности. "
                 "Но выполни изменения, которые пользователь явно попросил. "
@@ -1765,7 +1765,10 @@ async def generate(message: Message):
         method="POST"
     )
 
-    response = await asyncio.to_thread(urllib.request.urlopen, req)
+    response = await asyncio.to_thread(
+        urllib.request.urlopen,
+        req
+    )
     result = json.loads(response.read().decode("utf-8"))
     task_id = result["data"]["taskId"]
 
@@ -1800,11 +1803,16 @@ async def generate(message: Message):
             break
 
         if task_status in ("fail", "failed"):
-            raise Exception(f"GPT Image 2 HA failed: {task_data.get('error')}")
+            raise Exception(
+                f"GPT Image 2 HA failed: {task_data.get('error')}"
+            )
 
         await asyncio.sleep(3)
+
     else:
-        raise Exception("GPT Image 2 HA: превышено время ожидания")
+        raise Exception(
+            "GPT Image 2 HA: превышено время ожидания"
+        )
     elif selected_model == "seedream":
         reference_data_uris = [
     "data:image/jpeg;base64,"
