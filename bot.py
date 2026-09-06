@@ -1770,12 +1770,12 @@ async def generate(message: Message):
                     req
                 )
 
-                result = json.loads(response.read().decode("utf-8"))
+            result = json.loads(response.read().decode("utf-8"))
                 task_id = result["data"]["taskId"]
 
-                await asyncio.sleep(3)
+            await asyncio.sleep(3)
 
-                for _ in range(100):
+            for _ in range(100):
                     status_req = urllib.request.Request(
                         f"https://api.hiapi.ai/v1/tasks/{task_id}",
                         headers={
@@ -1813,7 +1813,7 @@ async def generate(message: Message):
 
                     await asyncio.sleep(3)
 
-    else:
+            else:
                     raise Exception(
                         "GPT Image 2 HA: превышено время ожидания"
                     )
