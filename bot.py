@@ -1771,7 +1771,7 @@ async def generate(message: Message):
                 )
 
             result = json.loads(response.read().decode("utf-8"))
-                task_id = result["data"]["taskId"]
+            task_id = result["data"]["taskId"]
 
             await asyncio.sleep(3)
 
