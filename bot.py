@@ -1740,7 +1740,7 @@ async def generate(message: Message):
                     + base64.b64encode(reference_images[0]).decode("utf-8")
                 )
 
-                payload = {
+            payload = {
                     "model": "gpt-image-2/image-to-image",
                     "input": {
                         "prompt": (
@@ -1755,7 +1755,7 @@ async def generate(message: Message):
                     }
                 }
 
-                req = urllib.request.Request(
+            req = urllib.request.Request(
                     "https://api.hiapi.ai/v1/tasks",
                     data=json.dumps(payload).encode("utf-8"),
                     headers={
@@ -1765,7 +1765,7 @@ async def generate(message: Message):
                     method="POST"
                 )
 
-                response = await asyncio.to_thread(
+            response = await asyncio.to_thread(
                     urllib.request.urlopen,
                     req
                 )
@@ -1817,6 +1817,7 @@ async def generate(message: Message):
                     raise Exception(
                         "GPT Image 2 HA: превышено время ожидания"
                     )
+        
     elif selected_model == "seedream":
         reference_data_uris = [
     "data:image/jpeg;base64,"
