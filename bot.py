@@ -3,6 +3,8 @@ import asyncio
 import base64
 import urllib.request
 import json
+import cloudinary
+import cloudinary.uploader
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
@@ -20,6 +22,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 FAL_KEY = os.getenv("FAL_KEY")
 WAVESPEED_API_KEY = os.getenv("WAVESPEED_API_KEY")
 HIAPI_API_KEY = os.getenv("HIAPI_API_KEY")
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -1735,12 +1738,20 @@ async def generate(message: Message):
 
                 await asyncio.sleep(2)
         elif selected_model == "gpt2_ha":
-            reference_image = (
+                reference_image = (
                     "data:image/jpeg;base64,"
                     + base64.b64encode(reference_images[0]).decode("utf-8")
                 )
 
-            payload = {
+                upload_result = await asyncio.to_thread(
+                    cloudinary.uploader.upload,
+                    reference_image,
+                    folder="promtman-temp"
+                )
+
+                reference_url = upload_result["secure_url"]
+
+                payload = {
                     "model": "gpt-image-2/image-to-image",
                     "input": {
                         "prompt": (
@@ -1749,7 +1760,7 @@ async def generate(message: Message):
                             "Но выполни изменения, которые пользователь явно попросил. "
                             "Запрос пользователя: " + prompt_text
                         ),
-                        "image": reference_image,
+                        "input_urls": [reference_url],
                         "aspect_ratio": reference_data.get("ratio", "1:1"),
                         "resolution": reference_data.get("quality", "1K")
                     }
