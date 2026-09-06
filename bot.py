@@ -1818,8 +1818,8 @@ async def generate(message: Message):
                         "GPT Image 2 HA: превышено время ожидания"
                     )
         
-    elif selected_model == "seedream":
-        reference_data_uris = [
+        elif selected_model == "seedream":
+            reference_data_uris = [
     "data:image/jpeg;base64,"
     + base64.b64encode(img).decode("utf-8")
     for img in reference_images
