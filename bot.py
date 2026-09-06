@@ -19,6 +19,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 FAL_KEY = os.getenv("FAL_KEY")
 WAVESPEED_API_KEY = os.getenv("WAVESPEED_API_KEY")
+HIAPI_API_KEY = os.getenv("HIAPI_API_KEY")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -220,6 +221,7 @@ async def generate_reference_start(message: Message):
         inline_keyboard=[
             [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
             [InlineKeyboardButton(text="✨ GPT Image 2", callback_data="model_gpt2")],
+            [InlineKeyboardButton(text="🎨 GPT Image 2 HA", callback_data="model_gpt2_ha")],
             [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
             [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")], 
             [InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем", callback_data="model_seedream_ws")]
@@ -256,6 +258,94 @@ async def select_gpt2(callback: CallbackQuery):
         "✨ Выбран GPT Image 2.\n\n"
         "Выбери качество:",
         reply_markup=quality_menu
+    )
+@dp.callback_query(lambda c: c.data == "model_gpt2_ha")
+async def select_gpt2_ha(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1K", callback_data="gpt2ha_1k"),
+                InlineKeyboardButton(text="2K", callback_data="gpt2ha_2k"),
+                InlineKeyboardButton(text="4K", callback_data="gpt2ha_4k"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "🎨 Выбран GPT Image 2 HA.\n\n"
+        "Выбери качество:",
+        reply_markup=quality_menu
+    )
+@dp.callback_query(lambda c: c.data in ["gpt2ha_1k", "gpt2ha_2k", "gpt2ha_4k"])
+async def select_gpt2ha_quality(callback: CallbackQuery):
+    await callback.answer()
+
+    quality_map = {
+        "gpt2ha_1k": "1K",
+        "gpt2ha_2k": "2K",
+        "gpt2ha_4k": "4K",
+    }
+
+    quality = quality_map[callback.data]
+
+    user_references[callback.from_user.id] = {
+        "model": "gpt2_ha",
+        "images": [],
+        "quality": quality
+    }
+
+    format_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="1:1", callback_data="gpt2ha_ratio_1_1"),
+                InlineKeyboardButton(text="9:16", callback_data="gpt2ha_ratio_9_16"),
+                InlineKeyboardButton(text="16:9", callback_data="gpt2ha_ratio_16_9"),
+            ],
+            [
+                InlineKeyboardButton(text="3:4", callback_data="gpt2ha_ratio_3_4"),
+                InlineKeyboardButton(text="4:3", callback_data="gpt2ha_ratio_4_3"),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        f"🎨 GPT Image 2 HA — {quality}\n\n"
+        "📐 Теперь выбери формат изображения:",
+        reply_markup=format_menu
+    )
+@dp.callback_query(
+    lambda c: c.data in [
+        "gpt2ha_ratio_1_1",
+        "gpt2ha_ratio_9_16",
+        "gpt2ha_ratio_16_9",
+        "gpt2ha_ratio_3_4",
+        "gpt2ha_ratio_4_3",
+    ]
+)
+async def select_gpt2ha_ratio(callback: CallbackQuery):
+    await callback.answer()
+
+    ratio_map = {
+        "gpt2ha_ratio_1_1": "1:1",
+        "gpt2ha_ratio_9_16": "9:16",
+        "gpt2ha_ratio_16_9": "16:9",
+        "gpt2ha_ratio_3_4": "3:4",
+        "gpt2ha_ratio_4_3": "4:3",
+    }
+
+    user_id = callback.from_user.id
+
+    if user_id not in user_references:
+        await callback.message.answer("❌ Сначала выбери качество.")
+        return
+
+    user_references[user_id]["ratio"] = ratio_map[callback.data]
+
+    await callback.message.answer(
+        f"✅ Формат: {ratio_map[callback.data]}\n\n"
+        "📷 Теперь отправь фото-референс."
     )
 @dp.callback_query(lambda c: c.data in ["gpt2_1k", "gpt2_2k", "gpt2_4k"])
 async def select_gpt2_quality(callback: CallbackQuery):
