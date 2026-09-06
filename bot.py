@@ -1734,9 +1734,79 @@ async def generate(message: Message):
                     raise Exception("GPT Image 2 generation failed")
 
                 await asyncio.sleep(2)
+        elif selected_model == "gpt2_ha":
+            reference_image = (
+        "data:image/jpeg;base64,"
+        + base64.b64encode(reference_images[0]).decode("utf-8")
+    )
 
-        elif selected_model == "seedream":
-            reference_data_uris = [
+    payload = {
+        "model": "gpt-image-2/image-to-image",
+        "input": {
+            "prompt": (
+                "Используй человека с референсного фото как основу. "
+                "Сохрани его узнаваемость и основные черты внешности. "
+                "Но выполни изменения, которые пользователь явно попросил. "
+                "Запрос пользователя: " + prompt_text
+            ),
+            "image": reference_image,
+            "aspect_ratio": reference_data.get("ratio", "1:1"),
+            "resolution": reference_data.get("quality", "1K")
+        }
+    }
+
+    req = urllib.request.Request(
+        "https://api.hiapi.ai/v1/tasks",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {HIAPI_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    response = await asyncio.to_thread(urllib.request.urlopen, req)
+    result = json.loads(response.read().decode("utf-8"))
+    task_id = result["data"]["taskId"]
+
+    await asyncio.sleep(3)
+
+    for _ in range(100):
+        status_req = urllib.request.Request(
+            f"https://api.hiapi.ai/v1/tasks/{task_id}",
+            headers={
+                "Authorization": f"Bearer {HIAPI_API_KEY}"
+            }
+        )
+
+        status_response = await asyncio.to_thread(
+            urllib.request.urlopen,
+            status_req
+        )
+        status_result = json.loads(
+            status_response.read().decode("utf-8")
+        )
+
+        task_data = status_result["data"]
+        task_status = task_data["status"]
+
+        if task_status == "success":
+            image_url = task_data["output"][0]["url"]
+            image_response = await asyncio.to_thread(
+                urllib.request.urlopen,
+                image_url
+            )
+            image_bytes = image_response.read()
+            break
+
+        if task_status in ("fail", "failed"):
+            raise Exception(f"GPT Image 2 HA failed: {task_data.get('error')}")
+
+        await asyncio.sleep(3)
+    else:
+        raise Exception("GPT Image 2 HA: превышено время ожидания")
+    elif selected_model == "seedream":
+        reference_data_uris = [
     "data:image/jpeg;base64,"
     + base64.b64encode(img).decode("utf-8")
     for img in reference_images
