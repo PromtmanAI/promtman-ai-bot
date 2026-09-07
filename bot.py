@@ -278,7 +278,25 @@ async def start(message: Message):
         reply_markup=reply_menu
     )
 
+    repeat_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✨ Повторить с моим фото",
+                    callback_data="repeat_seedance_boudoir"
+                )
+            ]
+        ]
+    )
 
+    await message.answer_video(
+        video="BAACAgEAAxkDAAIDKmqezw4QWL5cOgYj2uIGcOwfvTyaAAJECAACxXP5RKw0J2-Gd0xJPQQ",
+        caption=(
+            "🔥 Готовый тренд\n\n"
+            "Создай такое же видео со своим фото 👇"
+        ),
+        reply_markup=repeat_menu
+    )
 @dp.callback_query(lambda c: c.data == "generate")
 async def generate_button(callback: CallbackQuery):
     await callback.answer()
