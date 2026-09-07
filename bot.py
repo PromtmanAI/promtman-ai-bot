@@ -1618,7 +1618,7 @@ async def generate_seedance_video(message: Message):
             }
 
         if data.get("video_model") == "seedance_turbo":
-            endpoint = "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.0-fast/image-to-video-turbo"
+            endpoint = "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.0-fast/text-to-video-turbo"
         else:
             endpoint = "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.5/text-to-video"
         request = urllib.request.Request(
