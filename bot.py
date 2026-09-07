@@ -1598,7 +1598,7 @@ async def generate_seedance_video(message: Message):
             "Content-Type": "application/json"
         }
 
-                if data.get("video_model") == "seedance_turbo":
+        if data.get("video_model") == "seedance_turbo":
             payload = {
                 "prompt": message.text,
                 "image": reference_urls[0],
