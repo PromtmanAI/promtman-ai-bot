@@ -1824,7 +1824,7 @@ async def generate(message: Message):
 
                     await asyncio.sleep(3)
 
-            else:
+                else:
                     raise Exception(
                         "GPT Image 2 HA: превышено время ожидания"
                     )
