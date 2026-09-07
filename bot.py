@@ -1601,7 +1601,7 @@ async def generate_seedance_video(message: Message):
         if data.get("video_model") == "seedance_turbo":
             payload = {
                 "prompt": message.text,
-                "image": reference_urls[0],
+                "reference_images": reference_urls[:9],
                 "aspect_ratio": data.get("video_ratio", "16:9"),
                 "resolution": data.get("video_resolution", "720p"),
                 "duration": data.get("video_duration", 5),
