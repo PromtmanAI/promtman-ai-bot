@@ -52,10 +52,10 @@ reply_menu = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="💎 Купить генерации"),
             KeyboardButton(text="👤 Профиль"),
-        ]
+        ],
         [
-            KeyboardButton(text="🔥 Готовые видео")
-    ]
+            KeyboardButton(text="🔥 Готовые видео"),
+        ],
     ],
     resize_keyboard=True
 )
