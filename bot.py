@@ -969,7 +969,7 @@ async def select_seedance_sound(callback: CallbackQuery):
         "✍️ Теперь напиши, что должно происходить в видео."
     )
 async def upload_image_to_wavespeed(image_bytes):
-        headers = {
+    headers = {
         "Authorization": f"Bearer {WAVESPEED_API_KEY}",
         "Content-Type": "application/json"
     }
@@ -1014,6 +1014,7 @@ async def upload_image_to_wavespeed(image_bytes):
     )
 
     return download_url
+
 @dp.message(lambda message: message.photo is not None)
 async def receive_reference(message: Message):
     user_id = message.from_user.id
