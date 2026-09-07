@@ -1766,7 +1766,7 @@ async def generate(message: Message):
                     }
                 }
 
-            req = urllib.request.Request(
+                req = urllib.request.Request(
                     "https://api.hiapi.ai/v1/tasks",
                     data=json.dumps(payload).encode("utf-8"),
                     headers={
@@ -1776,17 +1776,17 @@ async def generate(message: Message):
                     method="POST"
                 )
 
-            response = await asyncio.to_thread(
+                response = await asyncio.to_thread(
                     urllib.request.urlopen,
                     req
                 )
 
-            result = json.loads(response.read().decode("utf-8"))
-            task_id = result["data"]["taskId"]
+                result = json.loads(response.read().decode("utf-8"))
+                task_id = result["data"]["taskId"]
 
-            await asyncio.sleep(3)
+                await asyncio.sleep(3)
 
-            for _ in range(100):
+                for _ in range(100):
                     status_req = urllib.request.Request(
                         f"https://api.hiapi.ai/v1/tasks/{task_id}",
                         headers={
