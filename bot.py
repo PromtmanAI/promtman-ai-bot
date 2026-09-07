@@ -1453,6 +1453,15 @@ async def generate_kling_video(message: Message):
 
     except Exception as e:
         await status.edit_text(f"❌ Ошибка генерации видео:\n{e}")
+@dp.message(Command("videoid"))
+async def get_video_file_id(message: Message):
+    if not message.reply_to_message or not message.reply_to_message.video:
+        await message.answer("❌ Ответь командой /videoid на нужное видео.")
+        return
+
+    await message.answer(
+        f"🎬 FILE_ID:\n{message.reply_to_message.video.file_id}"
+    )
 @dp.message(
     lambda message:
         message.text
