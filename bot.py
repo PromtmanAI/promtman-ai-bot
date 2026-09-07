@@ -814,6 +814,12 @@ async def receive_seedance_photo(message: Message):
 
     photo = await bot.download(message.photo[-1])
     data["video_images"].append(photo.read())
+    if data.get("repeat_seedance_prompt"):
+        repeat_message = message.model_copy(
+            update={"text": data["repeat_seedance_prompt"]}
+        )
+        await generate_seedance_video(repeat_message)
+        return
 
     done_menu = InlineKeyboardMarkup(
         inline_keyboard=[
