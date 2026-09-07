@@ -53,9 +53,29 @@ reply_menu = ReplyKeyboardMarkup(
             KeyboardButton(text="💎 Купить генерации"),
             KeyboardButton(text="👤 Профиль"),
         ]
+        [
+            KeyboardButton(text="🔥 Готовые видео")
     ],
     resize_keyboard=True
 )
+@dp.message(lambda message: message.text == "🔥 Готовые видео")
+async def ready_videos(message: Message):
+    repeat_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✨ Повторить с моим фото",
+                    callback_data="repeat_seedance_boudoir"
+                )
+            ]
+        ]
+    )
+
+    await message.answer_video(
+        video="BAACAgEAAxkDAAIDKmqezw4QWL5cOgYj2uIGcOwfvTyaAAJECAACxXP5RKw0J2-Gd0xJPQQ",
+        caption="🔥 Будуар — Seedance 2.5\n\nНажми кнопку ниже, чтобы создать такое видео со своим фото.",
+        reply_markup=repeat_menu
+    )
 @dp.message(lambda message: message.text == "🎬 Создать видео")
 async def video_start(message: Message):
     video_menu = InlineKeyboardMarkup(
