@@ -1576,7 +1576,7 @@ async def get_video_file_id(message: Message):
     lambda message:
         message.text
         and message.from_user.id in user_references
-        and user_references[message.from_user.id].get("video_model") == "seedance"
+        and user_references[message.from_user.id].get("video_model") in ["seedance", "seedance_turbo"]
         and user_references[message.from_user.id].get("video_images")
 )
 async def generate_seedance_video(message: Message):
