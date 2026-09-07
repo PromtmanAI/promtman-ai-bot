@@ -968,7 +968,7 @@ async def select_seedance_sound(callback: CallbackQuery):
     await callback.message.answer(
         "✍️ Теперь напиши, что должно происходить в видео."
     )
-    async def upload_image_to_wavespeed(image_bytes):
+async def upload_image_to_wavespeed(image_bytes):
         headers = {
         "Authorization": f"Bearer {WAVESPEED_API_KEY}",
         "Content-Type": "application/json"
