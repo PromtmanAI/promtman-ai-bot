@@ -843,6 +843,7 @@ async def receive_kling_photo(message: Message):
         message.photo
         and message.from_user.id in user_references
         and user_references[message.from_user.id].get("video_model") in ["seedance", "seedance_turbo"]
+)
 async def receive_seedance_photo(message: Message):
     user_id = message.from_user.id
     data = user_references[user_id]
