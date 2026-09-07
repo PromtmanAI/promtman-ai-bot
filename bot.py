@@ -126,20 +126,26 @@ async def repeat_seedance_boudoir(callback: CallbackQuery):
 @dp.message(lambda message: message.text == "🎬 Создать видео")
 async def video_start(message: Message):
     video_menu = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⚡ Kling 2.5 Turbo Pro",
-                    callback_data="video_kling"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔥 Seedance 2.5",
-                    callback_data="video_seedance"
-                )
-            ]
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="⚡ Kling 2.5 Turbo Pro",
+                callback_data="video_kling"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="🔥 Seedance 2.5",
+                callback_data="video_seedance"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="⚡ Seedance 2.0 Fast Turbo",
+                callback_data="video_seedance_turbo"
+            )
         ]
+    ]
     )
 
     await message.answer(
@@ -181,6 +187,20 @@ async def select_video_seedance(callback: CallbackQuery):
     await callback.message.answer(
         "🔥 Выбран Seedance 2.5.\n\n"
         "🖼 Отправь фото-референсы.\n"
+        "Можно добавить до 10 фото."
+    )
+@dp.callback_query(lambda c: c.data == "video_seedance_turbo")
+async def select_video_seedance_turbo(callback: CallbackQuery):
+    await callback.answer()
+
+    user_references[callback.from_user.id] = {
+        "video_model": "seedance_turbo",
+        "video_images": []
+    }
+
+    await callback.message.answer(
+        "⚡ Выбран Seedance 2.0 Fast Turbo.\n\n"
+        "🖼 Отправь фото-референс.\n"
         "Можно добавить до 10 фото."
     )
     
@@ -822,8 +842,7 @@ async def receive_kling_photo(message: Message):
     lambda message:
         message.photo
         and message.from_user.id in user_references
-        and user_references[message.from_user.id].get("video_model") == "seedance"
-)
+        and user_references[message.from_user.id].get("video_model") in ["seedance", "seedance_turbo"]
 async def receive_seedance_photo(message: Message):
     user_id = message.from_user.id
     data = user_references[user_id]
@@ -1578,17 +1597,31 @@ async def generate_seedance_video(message: Message):
             "Content-Type": "application/json"
         }
 
-        payload = {
-            "prompt": message.text,
-            "reference_images": reference_urls,
-            "aspect_ratio": data.get("video_ratio", "16:9"),
-            "resolution": data.get("video_resolution", "720p"),
-            "duration": data.get("video_duration", 5),
-            "generate_audio": data.get("video_audio", True)
-        }
+                if data.get("video_model") == "seedance_turbo":
+            payload = {
+                "prompt": message.text,
+                "image": reference_urls[0],
+                "aspect_ratio": data.get("video_ratio", "16:9"),
+                "resolution": data.get("video_resolution", "720p"),
+                "duration": data.get("video_duration", 5),
+                "generate_audio": data.get("video_audio", True)
+            }
+        else:
+            payload = {
+                "prompt": message.text,
+                "reference_images": reference_urls,
+                "aspect_ratio": data.get("video_ratio", "16:9"),
+                "resolution": data.get("video_resolution", "720p"),
+                "duration": data.get("video_duration", 5),
+                "generate_audio": data.get("video_audio", True)
+            }
 
+        if data.get("video_model") == "seedance_turbo":
+            endpoint = "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.0-fast/image-to-video-turbo"
+        else:
+            endpoint = "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.5/text-to-video"
         request = urllib.request.Request(
-            "https://api.wavespeed.ai/api/v3/bytedance/seedance-2.5/text-to-video",
+            endpoint,
             data=json.dumps(payload).encode("utf-8"),
             headers=headers,
             method="POST"
