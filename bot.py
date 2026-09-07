@@ -848,8 +848,8 @@ async def receive_seedance_photo(message: Message):
     user_id = message.from_user.id
     data = user_references[user_id]
 
-    if len(data["video_images"]) >= 10:
-        await message.answer("⚠️ Можно добавить максимум 10 фото.")
+    if len(data["video_images"]) >= 9:
+        await message.answer("⚠️ Можно добавить максимум 9 фото.")
 
     photo = await bot.download(message.photo[-1])
     data["video_images"].append(photo.read())
