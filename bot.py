@@ -2044,6 +2044,11 @@ async def repeat_generation(callback: CallbackQuery):
     )
 
     await generate(repeat_message)
+@dp.message(lambda message: message.video is not None)
+async def get_video_file_id(message: Message):
+    await message.answer(
+        f"🎬 FILE_ID:\n{message.video.file_id}"
+    )
 async def main():
     await dp.start_polling(bot)
 
