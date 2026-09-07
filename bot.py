@@ -55,6 +55,7 @@ reply_menu = ReplyKeyboardMarkup(
         ]
         [
             KeyboardButton(text="🔥 Готовые видео")
+    ]
     ],
     resize_keyboard=True
 )
