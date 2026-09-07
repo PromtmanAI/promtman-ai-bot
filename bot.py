@@ -2044,10 +2044,14 @@ async def repeat_generation(callback: CallbackQuery):
     )
 
     await generate(repeat_message)
-@dp.message(lambda message: message.video is not None)
+@dp.message(Command("videoid"))
 async def get_video_file_id(message: Message):
+    if not message.reply_to_message or not message.reply_to_message.video:
+        await message.answer("❌ Ответь командой /videoid на нужное видео.")
+        return
+
     await message.answer(
-        f"🎬 FILE_ID:\n{message.video.file_id}"
+        f"🎬 FILE_ID:\n{message.reply_to_message.video.file_id}"
     )
 async def main():
     await dp.start_polling(bot)
