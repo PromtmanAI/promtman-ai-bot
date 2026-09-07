@@ -201,7 +201,7 @@ async def select_video_seedance_turbo(callback: CallbackQuery):
     await callback.message.answer(
         "⚡ Выбран Seedance 2.0 Fast Turbo.\n\n"
         "🖼 Отправь фото-референс.\n"
-        "Можно добавить до 10 фото."
+        "Можно добавить до 9 фото."
     )
     
 @dp.callback_query(lambda c: c.data in ["kling_5", "kling_10"])
