@@ -1662,9 +1662,14 @@ async def generate_wan22_video(message: Message):
         }
 
         payload = {
-            "prompt": message.text,
+            "prompt": (
+    message.text
+    + " Preserve the exact identity and facial features of the person "
+      "from the reference image. Keep the same face, eyes, nose, lips, "
+      "hairstyle, age and appearance throughout the entire video."
+),
             "image": image_data_uri,
-            "duration": 5
+            "duration": data.get("video_duration", 5)
         }
 
         request = urllib.request.Request(
