@@ -860,6 +860,23 @@ async def receive_kling_photo(message: Message):
     lambda message:
         message.photo
         and message.from_user.id in user_references
+        and user_references[message.from_user.id].get("video_model") == "wan22"
+        and user_references[message.from_user.id].get("video_image") is None
+)
+async def receive_wan22_photo(message: Message):
+    user_id = message.from_user.id
+
+    photo = await bot.download(message.photo[-1])
+    user_references[user_id]["video_image"] = photo.read()
+
+    await message.answer(
+        "✅ Фото получено.\n\n"
+        "✍️ Теперь напиши, что должно происходить в видео."
+    )
+@dp.message(
+    lambda message:
+        message.photo
+        and message.from_user.id in user_references
         and user_references[message.from_user.id].get("video_model") in ["seedance", "seedance_turbo"]
 )
 async def receive_seedance_photo(message: Message):
