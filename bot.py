@@ -161,13 +161,42 @@ async def video_start(message: Message):
 async def select_video_wan22(callback: CallbackQuery):
     await callback.answer()
 
+    duration_menu = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⚡ 5 секунд",
+                    callback_data="wan22_5"
+                ),
+                InlineKeyboardButton(
+                    text="🎬 8 секунд",
+                    callback_data="wan22_8"
+                ),
+            ]
+        ]
+    )
+
+    await callback.message.answer(
+        "💸 Выбран Wan 2.2 Ultra Fast.\n\n"
+        "⏱ Выбери длительность видео:",
+        reply_markup=duration_menu
+    )
+
+
+@dp.callback_query(lambda c: c.data in ["wan22_5", "wan22_8"])
+async def select_wan22_duration(callback: CallbackQuery):
+    await callback.answer()
+
+    duration = 5 if callback.data == "wan22_5" else 8
+
     user_references[callback.from_user.id] = {
         "video_model": "wan22",
-        "video_image": None
+        "video_image": None,
+        "video_duration": duration
     }
 
     await callback.message.answer(
-        "💸 Выбран Wan 2.2 Ultra Fast — Эконом.\n\n"
+        f"✅ Выбрано: {duration} сек.\n\n"
         "🖼 Отправь одно фото, которое хочешь оживить."
     )
 @dp.callback_query(lambda c: c.data == "video_kling")
