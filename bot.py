@@ -1612,6 +1612,100 @@ async def get_video_file_id(message: Message):
     lambda message:
         message.text
         and message.from_user.id in user_references
+        and user_references[message.from_user.id].get("video_model") == "wan22"
+        and user_references[message.from_user.id].get("video_image") is not None
+)
+async def generate_wan22_video(message: Message):
+    user_id = message.from_user.id
+    data = user_references[user_id]
+
+    status = await message.answer("💸 Создаю видео Wan 2.2 Ultra Fast...")
+
+    try:
+        image_data_uri = (
+            "data:image/jpeg;base64,"
+            + base64.b64encode(data["video_image"]).decode("utf-8")
+        )
+
+        headers = {
+            "Authorization": f"Bearer {WAVESPEED_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "prompt": message.text,
+            "image": image_data_uri,
+            "duration": 5
+        }
+
+        request = urllib.request.Request(
+            "https://api.wavespeed.ai/api/v3/wavespeed-ai/wan-2.2/i2v-480p-ultra-fast",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+
+        response = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(request, timeout=60).read()
+        )
+
+        task_data = json.loads(response)
+        task_id = task_data["data"]["id"]
+
+        while True:
+            await asyncio.sleep(3)
+
+            result_request = urllib.request.Request(
+                f"https://api.wavespeed.ai/api/v3/predictions/{task_id}/result",
+                headers={"Authorization": f"Bearer {WAVESPEED_API_KEY}"}
+            )
+
+            result_response = await asyncio.to_thread(
+                lambda: urllib.request.urlopen(
+                    result_request,
+                    timeout=30
+                ).read()
+            )
+
+            result_data = json.loads(result_response)["data"]
+            task_status = result_data["status"]
+
+            if task_status == "completed":
+                video_url = result_data["outputs"][0]
+                break
+
+            if task_status in {"failed", "cancelled", "timeout"}:
+                raise RuntimeError(
+                    result_data.get("error") or f"WaveSpeed: {task_status}"
+                )
+
+        video_bytes = await asyncio.to_thread(
+            lambda: urllib.request.urlopen(
+                video_url,
+                timeout=120
+            ).read()
+        )
+
+        await status.delete()
+
+        await message.answer_video(
+            BufferedInputFile(
+                video_bytes,
+                filename="wan22_video.mp4"
+            ),
+            caption="💸 Wan 2.2 Ultra Fast — готово!"
+        )
+
+        user_references.pop(user_id, None)
+
+    except Exception as e:
+        await status.edit_text(
+            f"❌ Ошибка Wan 2.2:\n{e}"
+            )
+@dp.message(
+    lambda message:
+        message.text
+        and message.from_user.id in user_references
         and user_references[message.from_user.id].get("video_model") in ["seedance", "seedance_turbo"]
         and user_references[message.from_user.id].get("video_images")
 )
