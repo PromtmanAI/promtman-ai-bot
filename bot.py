@@ -150,9 +150,9 @@ async def video_start(message: Message):
                 text="💸 Wan 2.2 Ultra Fast — Эконом",
                 callback_data="video_wan22"
             )
-        ]
+                ]
+    ]
     )
-
     await message.answer(
         "🎬 Выбери модель для видео:",
         reply_markup=video_menu
