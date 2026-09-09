@@ -139,18 +139,36 @@ async def video_start(message: Message):
                 callback_data="video_seedance"
             )
         ],
-        [
+                [
             InlineKeyboardButton(
                 text="⚡ Seedance 2.0 Fast Turbo",
                 callback_data="video_seedance_turbo"
             )
+        ],
+        [
+            InlineKeyboardButton(
+                text="💸 Wan 2.2 Ultra Fast — Эконом",
+                callback_data="video_wan22"
+            )
         ]
-    ]
     )
 
     await message.answer(
         "🎬 Выбери модель для видео:",
         reply_markup=video_menu
+    )
+@dp.callback_query(lambda c: c.data == "video_wan22")
+async def select_video_wan22(callback: CallbackQuery):
+    await callback.answer()
+
+    user_references[callback.from_user.id] = {
+        "video_model": "wan22",
+        "video_image": None
+    }
+
+    await callback.message.answer(
+        "💸 Выбран Wan 2.2 Ultra Fast — Эконом.\n\n"
+        "🖼 Отправь одно фото, которое хочешь оживить."
     )
 @dp.callback_query(lambda c: c.data == "video_kling")
 async def select_video_kling(callback: CallbackQuery):
