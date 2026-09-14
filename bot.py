@@ -1386,68 +1386,127 @@ async def profile_button(callback: CallbackQuery):
 async def buy_text(message: Message):
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="💠 50 токенов — 50 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="💠 100 токенов — 100 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="💠 300 токенов — 300 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="💠 600 токенов — 600 ⭐", callback_data="buy_600")],
-            [InlineKeyboardButton(text="💠 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
+            [InlineKeyboardButton(text="💠 10 кредитов — 70 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="💠 25 кредитов — 160 ⭐", callback_data="buy_25")],
+            [InlineKeyboardButton(text="💠 50 кредитов — 300 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 100 кредитов — 550 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 180 кредитов — 900 ⭐", callback_data="buy_180")],
+            [InlineKeyboardButton(text="💠 300 кредитов — 1400 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 650 кредитов — 2900 ⭐", callback_data="buy_650")],
+            [InlineKeyboardButton(text="💠 1200 кредитов — 5000 ⭐", callback_data="buy_1200")]
         ]
     )
 
     await message.answer(
-        "💠 Выбери пакет токенов:",
+        "💠 Выбери пакет кредитов:",
         reply_markup=buy_menu
     )
+
+
 @dp.callback_query(lambda c: c.data == "buy")
 async def buy_button(callback: CallbackQuery):
     await callback.answer()
 
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="💠 50 токенов — 50 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="💠 100 токенов — 100 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="💠 300 токенов — 300 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="💠 600 токенов — 600 ⭐", callback_data="buy_600")],
-            [InlineKeyboardButton(text="💠 1000 токенов — 1000 ⭐", callback_data="buy_1000")]
+            [InlineKeyboardButton(text="💠 10 кредитов — 70 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="💠 25 кредитов — 160 ⭐", callback_data="buy_25")],
+            [InlineKeyboardButton(text="💠 50 кредитов — 300 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 100 кредитов — 550 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 180 кредитов — 900 ⭐", callback_data="buy_180")],
+            [InlineKeyboardButton(text="💠 300 кредитов — 1400 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 650 кредитов — 2900 ⭐", callback_data="buy_650")],
+            [InlineKeyboardButton(text="💠 1200 кредитов — 5000 ⭐", callback_data="buy_1200")]
         ]
     )
 
     await callback.message.answer(
-        "💠 Выбери пакет токенов:",
+        "💠 Выбери пакет кредитов:",
         reply_markup=buy_menu
     )
-@dp.callback_query(lambda c: c.data == "buy_50")
-async def buy_50(callback: CallbackQuery):
+
+
+async def send_stars_invoice(callback: CallbackQuery, credits: int, stars: int):
     await callback.answer()
 
     await callback.message.answer_invoice(
-        title="💠 50 токенов",
-        description="Пополнение баланса Promtman AI на 50 токенов",
-        payload="buy_50",
+        title=f"💠 {credits} кредитов",
+        description=f"Пополнение баланса Promtman AI на {credits} кредитов",
+        payload=f"buy_{credits}",
         currency="XTR",
         prices=[
-            LabeledPrice(label="50 токенов", amount=50)
+            LabeledPrice(
+                label=f"{credits} кредитов",
+                amount=stars
+            )
         ]
     )
+
+
+@dp.callback_query(lambda c: c.data == "buy_10")
+async def buy_10(callback: CallbackQuery):
+    await send_stars_invoice(callback, 10, 70)
+
+
+@dp.callback_query(lambda c: c.data == "buy_25")
+async def buy_25(callback: CallbackQuery):
+    await send_stars_invoice(callback, 25, 160)
+
+
+@dp.callback_query(lambda c: c.data == "buy_50")
+async def buy_50(callback: CallbackQuery):
+    await send_stars_invoice(callback, 50, 300)
+
+
+@dp.callback_query(lambda c: c.data == "buy_100")
+async def buy_100(callback: CallbackQuery):
+    await send_stars_invoice(callback, 100, 550)
+
+
+@dp.callback_query(lambda c: c.data == "buy_180")
+async def buy_180(callback: CallbackQuery):
+    await send_stars_invoice(callback, 180, 900)
+
+
+@dp.callback_query(lambda c: c.data == "buy_300")
+async def buy_300(callback: CallbackQuery):
+    await send_stars_invoice(callback, 300, 1400)
+
+
+@dp.callback_query(lambda c: c.data == "buy_650")
+async def buy_650(callback: CallbackQuery):
+    await send_stars_invoice(callback, 650, 2900)
+
+
+@dp.callback_query(lambda c: c.data == "buy_1200")
+async def buy_1200(callback: CallbackQuery):
+    await send_stars_invoice(callback, 1200, 5000)
+
+
 @dp.pre_checkout_query()
 async def pre_checkout(pre_checkout_query):
     await pre_checkout_query.answer(ok=True)
+
+
 @dp.message(lambda message: message.successful_payment is not None)
 async def successful_payment(message: Message):
     user_id = message.from_user.id
     payload = message.successful_payment.invoice_payload
 
     packages = {
+        "buy_10": 10,
+        "buy_25": 25,
         "buy_50": 50,
         "buy_100": 100,
+        "buy_180": 180,
         "buy_300": 300,
-        "buy_600": 600,
-        "buy_1000": 1000
+        "buy_650": 650,
+        "buy_1200": 1200
     }
 
-    tokens = packages.get(payload)
+    credits = packages.get(payload)
 
-    if tokens is None:
+    if credits is None:
         return
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -1459,64 +1518,13 @@ async def successful_payment(message: Message):
                 ON CONFLICT (user_id)
                 DO UPDATE SET balance = users.balance + %s
                 """,
-                (user_id, tokens, tokens)
+                (user_id, credits, credits)
             )
 
     await message.answer(
-        f"✅ Оплата прошла!\n"
-        f"💠 На баланс начислено {tokens} токенов."
+        f"✅ Оплата прошла!\n\n"
+        f"💠 На баланс начислено {credits} кредитов."
     )
-@dp.callback_query(lambda c: c.data == "buy_100")
-async def buy_100(callback: CallbackQuery):
-    await callback.answer()
-
-    await callback.message.answer_invoice(
-        title="💠 100 токенов",
-        description="Пополнение баланса Promtman AI на 100 токенов",
-        payload="buy_100",
-        currency="XTR",
-        prices=[LabeledPrice(label="100 токенов", amount=100)]
-    )
-
-
-@dp.callback_query(lambda c: c.data == "buy_300")
-async def buy_300(callback: CallbackQuery):
-    await callback.answer()
-
-    await callback.message.answer_invoice(
-        title="💠 300 токенов",
-        description="Пополнение баланса Promtman AI на 300 токенов",
-        payload="buy_300",
-        currency="XTR",
-        prices=[LabeledPrice(label="300 токенов", amount=300)]
-    )
-
-
-@dp.callback_query(lambda c: c.data == "buy_600")
-async def buy_600(callback: CallbackQuery):
-    await callback.answer()
-
-    await callback.message.answer_invoice(
-        title="💠 600 токенов",
-        description="Пополнение баланса Promtman AI на 600 токенов",
-        payload="buy_600",
-        currency="XTR",
-        prices=[LabeledPrice(label="600 токенов", amount=600)]
-    )
-
-
-@dp.callback_query(lambda c: c.data == "buy_1000")
-async def buy_1000(callback: CallbackQuery):
-    await callback.answer()
-
-    await callback.message.answer_invoice(
-        title="💠 1000 токенов",
-        description="Пополнение баланса Promtman AI на 1000 токенов",
-        payload="buy_1000",
-        currency="XTR",
-        prices=[LabeledPrice(label="1000 токенов", amount=1000)]
-    )
-
        
 @dp.message(Command("testcredits"))
 async def test_credits(message: Message):
