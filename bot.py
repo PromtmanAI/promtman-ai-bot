@@ -372,14 +372,14 @@ async def generate_button(callback: CallbackQuery):
     ) 
 @dp.message(lambda message: message.text == "🎨 Создать изображение")
 async def generate_reference_start(message: Message):
-    model_menu = InlineKeyboardMarkup(
+        model_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            InlineKeyboardButton(text="🎨 GPT Image — 2 💎", callback_data="model_gpt"),
-            InlineKeyboardButton(text="🎨 GPT Image 2 — от 3 💎", callback_data="model_gpt2"),
-            InlineKeyboardButton(text="🎨 GPT Image 2 HA — от 2 💎", callback_data="model_gpt2_ha"),
-            InlineKeyboardButton(text="🍌 Nano Banana Pro — от 4 💎", callback_data="model_nano_pro"),
-            InlineKeyboardButton(text="💥 Seedream 5.0 Pro — от 2 💎", callback_data="model_seedream"),
-            InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем — от 2 💎", callback_data="model_seedream_ws"),
+            [InlineKeyboardButton(text="🎨 GPT Image — 2 💎", callback_data="model_gpt")],
+            [InlineKeyboardButton(text="✨ GPT Image 2 — от 3 💎", callback_data="model_gpt2")],
+            [InlineKeyboardButton(text="🎨 GPT Image 2 HA — от 2 💎", callback_data="model_gpt2_ha")],
+            [InlineKeyboardButton(text="🍌 Nano Banana Pro — от 4 💎", callback_data="model_nano_pro")],
+            [InlineKeyboardButton(text="💥 Seedream 5.0 Pro — от 2 💎", callback_data="model_seedream")],
+            [InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем — от 2 💎", callback_data="model_seedream_ws")],
         ]
     )
 
