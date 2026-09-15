@@ -374,12 +374,12 @@ async def generate_button(callback: CallbackQuery):
 async def generate_reference_start(message: Message):
     model_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎨 GPT Image", callback_data="model_gpt")],
-            [InlineKeyboardButton(text="✨ GPT Image 2", callback_data="model_gpt2")],
-            [InlineKeyboardButton(text="🎨 GPT Image 2 HA", callback_data="model_gpt2_ha")],
-            [InlineKeyboardButton(text="🍌 Nano Banana Pro", callback_data="model_nano_pro")], 
-            [InlineKeyboardButton(text="💥 Seedream 5.0 Pro", callback_data="model_seedream")], 
-            [InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем", callback_data="model_seedream_ws")]
+            InlineKeyboardButton(text="🎨 GPT Image — 2 💎", callback_data="model_gpt"),
+            InlineKeyboardButton(text="🎨 GPT Image 2 — от 3 💎", callback_data="model_gpt2"),
+            InlineKeyboardButton(text="🎨 GPT Image 2 HA — от 2 💎", callback_data="model_gpt2_ha"),
+            InlineKeyboardButton(text="🍌 Nano Banana Pro — от 4 💎", callback_data="model_nano_pro"),
+            InlineKeyboardButton(text="💥 Seedream 5.0 Pro — от 2 💎", callback_data="model_seedream"),
+            InlineKeyboardButton(text="🌱 Seedream 5.0 Pro ⭐ Рекомендуем — от 2 💎", callback_data="model_seedream_ws"),
         ]
     )
 
@@ -402,9 +402,9 @@ async def select_gpt2(callback: CallbackQuery):
     quality_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1K", callback_data="gpt2_1k"),
-                InlineKeyboardButton(text="2K", callback_data="gpt2_2k"),
-                InlineKeyboardButton(text="4K", callback_data="gpt2_4k"),
+                InlineKeyboardButton(text="1K — 3 💎", callback_data="gpt2_1k"),
+                InlineKeyboardButton(text="2K — 4 💎", callback_data="gpt2_2k"),
+                InlineKeyboardButton(text="4K — 6 💎", callback_data="gpt2_4k"),
             ]
         ]
     )
@@ -421,9 +421,9 @@ async def select_gpt2_ha(callback: CallbackQuery):
     quality_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1K", callback_data="gpt2ha_1k"),
-                InlineKeyboardButton(text="2K", callback_data="gpt2ha_2k"),
-                InlineKeyboardButton(text="4K", callback_data="gpt2ha_4k"),
+                InlineKeyboardButton(text="1K — 2 💎", callback_data="gpt2ha_1k"),
+                InlineKeyboardButton(text="2K — 3 💎", callback_data="gpt2ha_2k"),
+                InlineKeyboardButton(text="4K — 4 💎", callback_data="gpt2ha_4k"),
             ]
         ]
     )
@@ -578,8 +578,8 @@ async def select_seedream(callback: CallbackQuery):
     quality_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1K — 1 💠", callback_data="fal_1k"),
-                InlineKeyboardButton(text="2K — 2 💠", callback_data="fal_2k"),
+                InlineKeyboardButton(text="1K — 2 💎", callback_data="fal_1k"),
+                InlineKeyboardButton(text="2K — 3 💎", callback_data="fal_2k"),
             ]
         ]
     )
@@ -664,9 +664,9 @@ async def select_seedream_ws(callback: CallbackQuery):
     quality_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1K", callback_data="ws_1k"),
-                InlineKeyboardButton(text="1.5K", callback_data="ws_1_5k"),
-                InlineKeyboardButton(text="2K", callback_data="ws_2k"),
+                InlineKeyboardButton(text="1K — 2 💎", callback_data="ws_1k"),
+                InlineKeyboardButton(text="1.5K — 2 💎", callback_data="ws_1_5k"),
+                InlineKeyboardButton(text="2K — 3 💎", callback_data="ws_2k"),
             ]
         ]
     )
@@ -750,9 +750,9 @@ async def select_nano_pro(callback: CallbackQuery):
     quality_menu = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1K", callback_data="nano_1k"),
-                InlineKeyboardButton(text="2K", callback_data="nano_2k"),
-                InlineKeyboardButton(text="4K", callback_data="nano_4k"),
+                InlineKeyboardButton(text="1K — 4 💎", callback_data="nano_1k"),
+                InlineKeyboardButton(text="2K — 4 💎", callback_data="nano_2k"),
+                InlineKeyboardButton(text="4K — 7 💎", callback_data="nano_4k"),
             ]
         ]
     )
