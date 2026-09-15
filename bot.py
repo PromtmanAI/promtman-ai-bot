@@ -1889,18 +1889,18 @@ async def generate(message: Message):
     selected_model = reference_data.get("model") if reference_data else None
     quality = reference_data.get("quality", "1K") if reference_data else "1K"
 
-    token_cost = 1
+    token_cost = 2  # GPT Image / gpt-image-1
 
     if selected_model == "nano_pro":
-        token_cost = 4 if quality == "4K" else 2
+        token_cost = 7 if quality == "4K" else 4
     elif selected_model == "gpt2":
-        token_cost = 4 if quality == "4K" else 2
+        token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
     elif selected_model == "gpt2_ha":
-        token_cost = 4 if quality == "4K" else 2        
+        token_cost = 4 if quality == "4K" else (3 if quality == "2K" else 2)
     elif selected_model == "seedream":
-        token_cost = 2 if quality == "2K" else 1
+        token_cost = 3 if quality == "2K" else 2
     elif selected_model == "seedream_ws":
-        token_cost = 2 if quality == "2K" else 1
+        token_cost = 3 if quality == "2K" else 2
 
     use_paid = False
 
@@ -2274,19 +2274,18 @@ async def generate(message: Message):
     BufferedInputFile(image_bytes, filename=f"promtman_{reference_data.get('quality', '1K')}.png"),
 )
         with psycopg.connect(DATABASE_URL) as conn:
-            token_cost = 1
+            token_cost = 2  # GPT Image / gpt-image-1
 
             if selected_model == "nano_pro":
-                token_cost = 4 if reference_data.get("quality") == "4K" else 2
-            elif selected_model == "gpt2":       
-                token_cost = 4 if reference_data.get("quality") == "4K" else 2
+                token_cost = 7 if quality == "4K" else 4
+            elif selected_model == "gpt2":
+                token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
             elif selected_model == "gpt2_ha":
-                token_cost = 4 if reference_data.get("quality") == "4K" else 2
+                token_cost = 4 if quality == "4K" else (3 if quality == "2K" else 2)
             elif selected_model == "seedream":
-                token_cost = 2 if reference_data.get("quality") == "2K" else 1
+                token_cost = 3 if quality == "2K" else 2
             elif selected_model == "seedream_ws":
-                token_cost = 2 if reference_data.get("quality") == "2K" else 1
-
+                token_cost = 3 if quality == "2K" else 2
             with conn.cursor() as cur:
                 if use_paid:
                     cur.execute(
