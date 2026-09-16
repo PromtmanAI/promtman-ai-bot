@@ -1891,16 +1891,15 @@ async def generate(message: Message):
     token_cost = 2  # GPT Image / gpt-image-1
 
     if selected_model == "nano_pro":
-        token_cost = 7 if quality == "4K" else 4
+        token_cost = 9 if quality == "4K" else 5
     elif selected_model == "gpt2":
-        token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
+        token_cost = 7 if quality == "4K" else (4 if quality == "2K" else 3)
     elif selected_model == "gpt2_ha":
-        token_cost = 4 if quality == "4K" else (3 if quality == "2K" else 2)
+        token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
     elif selected_model == "seedream":
-        token_cost = 3 if quality == "2K" else 2
+        token_cost = 5 if quality == "2K" else 3
     elif selected_model == "seedream_ws":
-        token_cost = 3 if quality == "2K" else 2
-
+        token_cost = 5 if quality == "2K" else 3
     use_paid = False
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -2276,16 +2275,15 @@ async def generate(message: Message):
             token_cost = 2  # GPT Image / gpt-image-1
 
             if selected_model == "nano_pro":
-                token_cost = 7 if quality == "4K" else 4
+                token_cost = 9 if quality == "4K" else 5
             elif selected_model == "gpt2":
-                token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
+                token_cost = 7 if quality == "4K" else (4 if quality == "2K" else 3)
             elif selected_model == "gpt2_ha":
-                token_cost = 4 if quality == "4K" else (3 if quality == "2K" else 2)
+                token_cost = 6 if quality == "4K" else (4 if quality == "2K" else 3)
             elif selected_model == "seedream":
-                token_cost = 3 if quality == "2K" else 2
+                token_cost = 5 if quality == "2K" else 3
             elif selected_model == "seedream_ws":
-                token_cost = 3 if quality == "2K" else 2
-            with conn.cursor() as cur:
+                token_cost = 5 if quality == "2K" else 3
                 if use_paid:
                     cur.execute(
                         "UPDATE users SET balance = balance - %s WHERE user_id = %s",
