@@ -1385,14 +1385,14 @@ async def profile_button(callback: CallbackQuery):
 async def buy_text(message: Message):
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="💠 10 кредитов — 70 ⭐", callback_data="buy_10")],
-            [InlineKeyboardButton(text="💠 25 кредитов — 160 ⭐", callback_data="buy_25")],
-            [InlineKeyboardButton(text="💠 50 кредитов — 300 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="💠 100 кредитов — 550 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="💠 180 кредитов — 900 ⭐", callback_data="buy_180")],
-            [InlineKeyboardButton(text="💠 300 кредитов — 1400 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="💠 650 кредитов — 2900 ⭐", callback_data="buy_650")],
-            [InlineKeyboardButton(text="💠 1200 кредитов — 5000 ⭐", callback_data="buy_1200")]
+            [InlineKeyboardButton(text="💠 30 кредитов — 70 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="💠 75 кредитов — 160 ⭐", callback_data="buy_25")],
+            [InlineKeyboardButton(text="💠 145 кредитов — 300 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 270 кредитов — 550 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 500 кредитов — 1000 ⭐", callback_data="buy_180")],
+            [InlineKeyboardButton(text="💠 710 кредитов — 1400 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 1500 кредитов — 2900 ⭐", callback_data="buy_650")],
+            [InlineKeyboardButton(text="💠 2650 кредитов — 5000 ⭐", callback_data="buy_1200")],
         ]
     )
 
@@ -1408,14 +1408,14 @@ async def buy_button(callback: CallbackQuery):
 
     buy_menu = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="💠 10 кредитов — 70 ⭐", callback_data="buy_10")],
-            [InlineKeyboardButton(text="💠 25 кредитов — 160 ⭐", callback_data="buy_25")],
-            [InlineKeyboardButton(text="💠 50 кредитов — 300 ⭐", callback_data="buy_50")],
-            [InlineKeyboardButton(text="💠 100 кредитов — 550 ⭐", callback_data="buy_100")],
-            [InlineKeyboardButton(text="💠 180 кредитов — 900 ⭐", callback_data="buy_180")],
-            [InlineKeyboardButton(text="💠 300 кредитов — 1400 ⭐", callback_data="buy_300")],
-            [InlineKeyboardButton(text="💠 650 кредитов — 2900 ⭐", callback_data="buy_650")],
-            [InlineKeyboardButton(text="💠 1200 кредитов — 5000 ⭐", callback_data="buy_1200")]
+            [InlineKeyboardButton(text="💠 30 кредитов — 70 ⭐", callback_data="buy_10")],
+            [InlineKeyboardButton(text="💠 75 кредитов — 160 ⭐", callback_data="buy_25")],
+            [InlineKeyboardButton(text="💠 145 кредитов — 300 ⭐", callback_data="buy_50")],
+            [InlineKeyboardButton(text="💠 270 кредитов — 550 ⭐", callback_data="buy_100")],
+            [InlineKeyboardButton(text="💠 500 кредитов — 1000 ⭐", callback_data="buy_180")],
+            [InlineKeyboardButton(text="💠 710 кредитов — 1400 ⭐", callback_data="buy_300")],
+            [InlineKeyboardButton(text="💠 1500 кредитов — 2900 ⭐", callback_data="buy_650")],
+            [InlineKeyboardButton(text="💠 2650 кредитов — 5000 ⭐", callback_data="buy_1200")],
         ]
     )
 
@@ -1444,42 +1444,35 @@ async def send_stars_invoice(callback: CallbackQuery, credits: int, stars: int):
 
 @dp.callback_query(lambda c: c.data == "buy_10")
 async def buy_10(callback: CallbackQuery):
-    await send_stars_invoice(callback, 10, 70)
-
+    await send_stars_invoice(callback, 30, 70)
 
 @dp.callback_query(lambda c: c.data == "buy_25")
 async def buy_25(callback: CallbackQuery):
-    await send_stars_invoice(callback, 25, 160)
-
+    await send_stars_invoice(callback, 75, 160)
 
 @dp.callback_query(lambda c: c.data == "buy_50")
 async def buy_50(callback: CallbackQuery):
-    await send_stars_invoice(callback, 50, 300)
-
+    await send_stars_invoice(callback, 145, 300)
 
 @dp.callback_query(lambda c: c.data == "buy_100")
 async def buy_100(callback: CallbackQuery):
-    await send_stars_invoice(callback, 100, 550)
-
+    await send_stars_invoice(callback, 270, 550)
 
 @dp.callback_query(lambda c: c.data == "buy_180")
 async def buy_180(callback: CallbackQuery):
-    await send_stars_invoice(callback, 180, 900)
-
+    await send_stars_invoice(callback, 500, 1000)
 
 @dp.callback_query(lambda c: c.data == "buy_300")
 async def buy_300(callback: CallbackQuery):
-    await send_stars_invoice(callback, 300, 1400)
-
+    await send_stars_invoice(callback, 710, 1400)
 
 @dp.callback_query(lambda c: c.data == "buy_650")
 async def buy_650(callback: CallbackQuery):
-    await send_stars_invoice(callback, 650, 2900)
-
+    await send_stars_invoice(callback, 1500, 2900)
 
 @dp.callback_query(lambda c: c.data == "buy_1200")
 async def buy_1200(callback: CallbackQuery):
-    await send_stars_invoice(callback, 1200, 5000)
+    await send_stars_invoice(callback, 2650, 5000)
 
 
 @dp.pre_checkout_query()
@@ -1493,14 +1486,14 @@ async def successful_payment(message: Message):
     payload = message.successful_payment.invoice_payload
 
     packages = {
-        "buy_10": 10,
-        "buy_25": 25,
-        "buy_50": 50,
-        "buy_100": 100,
-        "buy_180": 180,
-        "buy_300": 300,
-        "buy_650": 650,
-        "buy_1200": 1200
+    "buy_10": 30,
+    "buy_25": 75,
+    "buy_50": 145,
+    "buy_100": 270,
+    "buy_180": 500,
+    "buy_300": 710,
+    "buy_650": 1500,
+    "buy_1200": 2650
     }
 
     credits = packages.get(payload)
