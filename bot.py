@@ -1484,7 +1484,7 @@ async def pre_checkout(pre_checkout_query):
 async def successful_payment(message: Message):
     user_id = message.from_user.id
     payload = message.successful_payment.invoice_payload
-
+    print("PAYMENT SUCCESS:", user_id, repr(payload))
     packages = {
     "buy_10": 30,
     "buy_25": 75,
@@ -1499,8 +1499,9 @@ async def successful_payment(message: Message):
     credits = packages.get(payload)
 
     if credits is None:
+        print("UNKNOWN PAYMENT PAYLOAD:", repr(payload))
         return
-
+        
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
