@@ -1483,41 +1483,63 @@ async def pre_checkout(pre_checkout_query):
 @dp.message(lambda message: message.successful_payment is not None)
 async def successful_payment(message: Message):
     user_id = message.from_user.id
-    payload = message.successful_payment.invoice_payload
-    print("PAYMENT SUCCESS:", user_id, repr(payload))
+    payment = message.successful_payment
+    payload = payment.invoice_payload
+
     packages = {
-    "buy_10": 30,
-    "buy_25": 75,
-    "buy_50": 145,
-    "buy_100": 270,
-    "buy_180": 500,
-    "buy_300": 710,
-    "buy_650": 1500,
-    "buy_1200": 2650
+        "buy_10": 30,
+        "buy_25": 75,
+        "buy_50": 145,
+        "buy_100": 270,
+        "buy_180": 500,
+        "buy_300": 710,
+        "buy_650": 1500,
+        "buy_1200": 2650,
     }
 
     credits = packages.get(payload)
 
     if credits is None:
         print("UNKNOWN PAYMENT PAYLOAD:", repr(payload))
+        await message.answer(
+            "❌ Оплата прошла, но пакет не найден. Обратитесь в поддержку."
+        )
         return
-        
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO users (user_id, balance)
-                VALUES (%s, %s)
-                ON CONFLICT (user_id)
-                DO UPDATE SET balance = users.balance + %s
-                """,
-                (user_id, credits, credits)
-            )
 
-    await message.answer(
-        f"✅ Оплата прошла!\n\n"
-        f"💠 На баланс начислено {credits} кредитов."
-    )
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO users (user_id, balance)
+                    VALUES (%s, %s)
+                    ON CONFLICT (user_id)
+                    DO UPDATE SET balance = users.balance + EXCLUDED.balance
+                    RETURNING balance
+                    """,
+                    (user_id, credits),
+                )
+
+                new_balance = cur.fetchone()[0]
+
+            conn.commit()
+
+        print(
+            f"PAYMENT SUCCESS: user={user_id}, "
+            f"payload={payload}, credits={credits}, balance={new_balance}"
+        )
+
+        await message.answer(
+            f"✅ Оплата прошла!\n\n"
+            f"💠 Начислено: {credits} кредитов\n"
+            f"💰 Баланс: {new_balance} кредитов"
+        )
+
+    except Exception as e:
+        print("PAYMENT CREDIT ERROR:", repr(e))
+        await message.answer(
+            "⚠️ Оплата получена, но произошла ошибка начисления кредитов."
+        )
        
 @dp.message(Command("testcredits"))
 async def test_credits(message: Message):
