@@ -1487,14 +1487,14 @@ async def successful_payment(message: Message):
     payload = payment.invoice_payload
 
     packages = {
-        "buy_10": 30,
-        "buy_25": 75,
-        "buy_50": 145,
-        "buy_100": 270,
-        "buy_180": 500,
-        "buy_300": 710,
-        "buy_650": 1500,
-        "buy_1200": 2650,
+    "buy_30": 30,
+    "buy_75": 75,
+    "buy_145": 145,
+    "buy_270": 270,
+    "buy_500": 500,
+    "buy_710": 710,
+    "buy_1500": 1500,
+    "buy_2650": 2650,
     }
 
     credits = packages.get(payload)
